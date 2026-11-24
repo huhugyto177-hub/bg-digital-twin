@@ -71,6 +71,8 @@ def load_benchmark(path: Path | str) -> tuple[SimulationConfig, Optional[Molecul
         noise_std=sim.get("noise_std", 0.0),
         seed=sim.get("seed", 42),
         n_sensitivity_runs=sim.get("n_sensitivity_runs", 30),
+        analysis_window_start_h=sim.get("analysis_window_start_h"),
+        analysis_window_end_h=sim.get("analysis_window_end_h"),
     )
     perturbation = parse_perturbation(raw.get("perturbation"))
     params = load_baseline_params(preset)

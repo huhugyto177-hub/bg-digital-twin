@@ -1,0 +1,40 @@
+name: d1_partial_agonist_tavapadon_like
+description: D1/D5 partial-agonist illustration (tavapadon-like). Intrinsic activity
+  0.5 is a scenario fraction, not a published value.
+illustration: mechanistic
+potency_note: Mechanistic illustration, not a clinical claim and not a calibrated
+  regimen. potency not specified; normalized exposure shape.
+evidence_ids:
+- bezard_2024
+- young_2020_partial_d1
+pk_timing_notes: onset_h 0, tmax_h 1, and half_life_h 2 are the shared illustration
+  timebase, not published PK, except where a field is explicitly sourced below. intrinsic_activity
+  is a scenario fraction, not a published potency.
+baseline_preset: pd_depleted
+simulation:
+  duration_h: 8.0
+  dt_h: 0.05
+  noise_std: 0.0
+  seed: 42
+  n_sensitivity_runs: 8
+perturbation:
+  name: D1 partial agonist (tavapadon-like)
+  description: "Partial agonist ceiling is intrinsic_activity \xD7 max_effect."
+  notes: Mechanistic illustration, not a clinical claim and not a calibrated regimen.
+    potency not specified; normalized exposure shape. onset_h 0, tmax_h 1, and half_life_h
+    2 are the shared illustration timebase, not published PK, except where a field
+    is explicitly sourced below. intrinsic_activity 0.5 is a user-style scenario fraction,
+    not a published intrinsic activity for tavapadon. No EC50 or Cmax is asserted.
+  pk:
+    onset_h: 0.0
+    tmax_h: 1.0
+    half_life_h: 2.0
+    n_doses: 1
+  modulations:
+  - target_node: d1_direct
+    mechanism: partial_agonist
+    max_effect: 2.2
+    hill_coeff: 1.0
+    intrinsic_activity: 0.5
+expected:
+  partial_ceiling: true

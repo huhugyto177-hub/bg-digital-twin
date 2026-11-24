@@ -1,0 +1,49 @@
+name: ldopa_repeat_dosing
+description: Repeat-dosing illustration using the normalized L-DOPA-like envelope.
+  The interdose interval is a scenario choice, not a published regimen.
+illustration: mechanistic
+potency_note: Mechanistic illustration, not a clinical claim and not a calibrated
+  regimen. potency not specified; normalized exposure shape.
+evidence_ids:
+- contin_2010
+- nutt_2008
+- nutt_holford_1996
+pk_timing_notes: Interval 4 h is a scenario choice, not a published interdose interval.
+  Pulse shape is the illustration timebase.
+baseline_preset: pd_depleted
+simulation:
+  duration_h: 12.0
+  dt_h: 0.05
+  noise_std: 0.0
+  seed: 42
+  n_sensitivity_runs: 8
+  analysis_window_start_h: 0.5
+  analysis_window_end_h: 10.0
+perturbation:
+  name: L-DOPA repeat dosing
+  description: Three illustration pulses on the normalized L-DOPA-like envelope.
+  notes: Mechanistic illustration, not a clinical claim and not a calibrated regimen.
+    potency not specified; normalized exposure shape. dosing_interval_h 4 is a scenario
+    interval. Contin 2010 and Nutt 2008 describe a short half-life and wearing-off
+    but the abstracts used here do not state this interval.
+  pk:
+    onset_h: 0.0
+    tmax_h: 1.0
+    half_life_h: 2.0
+    n_doses: 3
+    dosing_interval_h: 4.0
+  modulations:
+  - target_node: dopamine_tone
+    mechanism: agonist
+    max_effect: 0.9
+    hill_coeff: 1.0
+  - target_node: d1_direct
+    mechanism: agonist
+    max_effect: 0.45
+    hill_coeff: 1.0
+  - target_node: d2_indirect
+    mechanism: agonist
+    max_effect: 0.3
+    hill_coeff: 1.0
+expected:
+  higher_exposure_auc_than_single_pulse: true

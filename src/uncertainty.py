@@ -8,7 +8,7 @@ from typing import Optional
 import numpy as np
 
 from .circuit_model import default_params_for_preset, simulate
-from .readouts import compute_readouts, summarize_kpis
+from .readouts import analysis_window_for, compute_readouts, summarize_kpis
 from .schemas import CircuitParams, MoleculePerturbation, SimulationConfig
 
 
@@ -21,6 +21,10 @@ class UncertaintyResult:
     p90: dict[str, float]
     samples: dict[str, np.ndarray]
     sensitivity_ranking: list[tuple[str, float]]
+    time_h: Optional[np.ndarray] = None
+    trajectory_p10: Optional[dict[str, np.ndarray]] = None
+    trajectory_p50: Optional[dict[str, np.ndarray]] = None
+    trajectory_p90: Optional[dict[str, np.ndarray]] = None
 
 
 def _latin_hypercube(n: int, d: int, rng: np.random.Generator) -> np.ndarray:
@@ -90,7 +94,19 @@ def run_uncertainty(
         scales = rng.normal(1.0, relative_spread / 1.96, size=(n, 2))
         scales = np.clip(scales, 1.0 - relative_spread, 1.0 + relative_spread)
 
+    window = analysis_window_for(config)
+    band_keys = (
+        "beta_proxy",
+        "motor_readiness",
+        "overdrive_index",
+        "pathway_balance",
+        "gpi_output",
+        "stn_gpe_coupling",
+        "therapeutic_window_trace",
+    )
     kpi_rows: list[dict[str, float]] = []
+    band_stack: dict[str, list[np.ndarray]] = {k: [] for k in band_keys}
+    t_ref: Optional[np.ndarray] = None
     for i in range(n):
         scale_da, scale_pot = float(scales[i, 0]), float(scales[i, 1])
         p = _perturb_params(base, scale_da, scale_pot)
@@ -98,18 +114,44 @@ def run_uncertainty(
         cfg = config.model_copy(update={"seed": config.seed + i, "noise_std": 0.0})
         t, states, _ = simulate(cfg, mol, p)
         readouts = compute_readouts(t, states, p)
-        kpi_rows.append(summarize_kpis(t, readouts))
+        kpi_rows.append(
+            summarize_kpis(
+                t,
+                readouts,
+                therapeutic_window=window,
+                pk=mol.pk if mol is not None else None,
+            )
+        )
+        if t_ref is None:
+            t_ref = t
+        for key in band_keys:
+            band_stack[key].append(np.asarray(readouts[key], dtype=float))
 
     names = sorted(kpi_rows[0].keys())
     samples = {k: np.array([row[k] for row in kpi_rows], dtype=float) for k in names}
 
     def pct(arr: np.ndarray, q: float) -> float:
-        return float(np.percentile(arr, q))
+        if arr.size == 0 or np.all(np.isnan(arr)):
+            return float("nan")
+        return float(np.nanpercentile(arr, q))
 
-    mean = {k: float(np.mean(v)) for k, v in samples.items()}
+    def _mean(arr: np.ndarray) -> float:
+        if arr.size == 0 or np.all(np.isnan(arr)):
+            return float("nan")
+        return float(np.nanmean(arr))
+
+    mean = {k: _mean(v) for k, v in samples.items()}
     p10 = {k: pct(v, 10) for k, v in samples.items()}
     p50 = {k: pct(v, 50) for k, v in samples.items()}
     p90 = {k: pct(v, 90) for k, v in samples.items()}
+
+    def band(stack: list[np.ndarray], q: float) -> np.ndarray:
+        arr = np.vstack(stack)
+        return np.nanpercentile(arr, q, axis=0)
+
+    trajectory_p10 = {k: band(v, 10) for k, v in band_stack.items()}
+    trajectory_p50 = {k: band(v, 50) for k, v in band_stack.items()}
+    trajectory_p90 = {k: band(v, 90) for k, v in band_stack.items()}
 
     ranking = one_at_a_time_sensitivity(config, perturbation, base, relative_spread)
     return UncertaintyResult(
@@ -120,6 +162,10 @@ def run_uncertainty(
         p90=p90,
         samples=samples,
         sensitivity_ranking=ranking,
+        time_h=t_ref,
+        trajectory_p10=trajectory_p10,
+        trajectory_p50=trajectory_p50,
+        trajectory_p90=trajectory_p90,
     )
 
 
@@ -138,11 +184,18 @@ def one_at_a_time_sensitivity(
         "exposure_potency": None,
     }
 
+    window = analysis_window_for(config)
+
     def metric(params: CircuitParams, mol: Optional[MoleculePerturbation], seed: int) -> float:
         cfg = config.model_copy(update={"seed": seed, "noise_std": 0.0})
         t, states, _ = simulate(cfg, mol, params)
         r = compute_readouts(t, states, params)
-        return summarize_kpis(t, r)["motor_mean_window"]
+        return summarize_kpis(
+            t,
+            r,
+            therapeutic_window=window,
+            pk=mol.pk if mol is not None else None,
+        )["motor_mean_window"]
 
     baseline = metric(base, perturbation, config.seed)
     scores: list[tuple[str, float]] = []

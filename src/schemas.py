@@ -5,7 +5,7 @@ from __future__ import annotations
 from enum import Enum
 from typing import Any, Optional
 
-from pydantic import BaseModel, Field, field_validator
+from pydantic import BaseModel, Field, field_validator, model_validator
 
 
 class TargetNode(str, Enum):
@@ -20,6 +20,7 @@ class TargetNode(str, Enum):
 class Mechanism(str, Enum):
     AGONIST = "agonist"
     ANTAGONIST = "antagonist"
+    PARTIAL_AGONIST = "partial_agonist"
     PAM = "pam"
     NAM = "nam"
     CHANNEL_BLOCKER = "channel_blocker"
@@ -33,8 +34,26 @@ class TargetModulation(BaseModel):
     max_effect: float = Field(..., description="Peak signed effect magnitude (unitless gain).")
     ec50_nM: Optional[float] = Field(None, gt=0)
     hill_coeff: float = Field(1.0, gt=0)
+    intrinsic_activity: Optional[float] = Field(
+        None,
+        gt=0,
+        le=1.0,
+        description=(
+            "Partial-agonist ceiling as a fraction of max_effect. "
+            "User-supplied mechanistic assumption, not a measured potency."
+        ),
+    )
 
     model_config = {"extra": "forbid"}
+
+    @model_validator(mode="after")
+    def _partial_agonist_needs_intrinsic_activity(self):
+        if self.mechanism == Mechanism.PARTIAL_AGONIST and self.intrinsic_activity is None:
+            raise ValueError(
+                "partial_agonist requires intrinsic_activity in (0, 1] "
+                "(user-supplied fraction of max_effect; not a measured potency)."
+            )
+        return self
 
 
 class PKProfile(BaseModel):
@@ -46,6 +65,11 @@ class PKProfile(BaseModel):
     cmax_nM: Optional[float] = Field(None, gt=0)
     dosing_interval_h: Optional[float] = Field(None, gt=0)
     n_doses: int = Field(1, ge=1)
+    ka_per_h: Optional[float] = Field(
+        None,
+        gt=0,
+        description="Optional user-supplied absorption rate (1/h). Not inferred from structure.",
+    )
 
     model_config = {"extra": "forbid"}
 
@@ -76,8 +100,21 @@ class SimulationConfig(BaseModel):
     noise_std: float = Field(0.0, ge=0)
     seed: int = 42
     n_sensitivity_runs: int = Field(30, ge=1)
+    # Optional analysis window (model hours). None keeps the readout default.
+    analysis_window_start_h: Optional[float] = Field(None, ge=0)
+    analysis_window_end_h: Optional[float] = Field(None, gt=0)
 
     model_config = {"extra": "forbid"}
+
+    @model_validator(mode="after")
+    def _window_ordered(self):
+        start = self.analysis_window_start_h
+        end = self.analysis_window_end_h
+        if (start is None) ^ (end is None):
+            raise ValueError("Set both analysis_window_start_h and analysis_window_end_h, or neither.")
+        if start is not None and end is not None and end <= start:
+            raise ValueError("analysis_window_end_h must be greater than analysis_window_start_h.")
+        return self
 
 
 class CircuitParams(BaseModel):
