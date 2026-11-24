@@ -1,0 +1,38 @@
+name: amantadine_nmda_stn
+description: Amantadine-like NMDA antagonism illustrated as an STN/hyperdirect channel
+  block.
+illustration: mechanistic
+potency_note: Mechanistic illustration, not a clinical claim and not a calibrated
+  regimen. potency not specified; normalized exposure shape.
+evidence_ids:
+- verhagen_1998
+- aoki_1988
+pk_timing_notes: onset_h 0, tmax_h 1, and half_life_h 2 are the shared illustration
+  timebase, not published PK, except where a field is explicitly sourced below.
+baseline_preset: pd_depleted
+simulation:
+  duration_h: 8.0
+  dt_h: 0.05
+  noise_std: 0.0
+  seed: 42
+  n_sensitivity_runs: 8
+perturbation:
+  name: Amantadine-like NMDA (STN proxy)
+  description: Channel-block proxy for STN/indirect NMDA antagonism.
+  notes: Mechanistic illustration, not a clinical claim and not a calibrated regimen.
+    potency not specified; normalized exposure shape. onset_h 0, tmax_h 1, and half_life_h
+    2 are the shared illustration timebase, not published PK, except where a field
+    is explicitly sourced below. Aoki and Sitar 1988 review amantadine PK; the abstract
+    does not state a single half-life used here.
+  pk:
+    onset_h: 0.0
+    tmax_h: 1.0
+    half_life_h: 2.0
+    n_doses: 1
+  modulations:
+  - target_node: stn_hyperdirect
+    mechanism: channel_blocker
+    max_effect: 1.0
+    hill_coeff: 1.0
+expected:
+  lowers_beta_vs_untreated: true

@@ -1,0 +1,40 @@
+name: d2_antagonist_haloperidol_like
+description: D2 antagonist negative control (haloperidol-like). Modest d2_indirect
+  antagonism raises the beta proxy from the depleted baseline (inverted-U surround);
+  it is not a benefit.
+illustration: mechanistic
+potency_note: Mechanistic illustration, not a clinical claim and not a calibrated
+  regimen. potency not specified; normalized exposure shape.
+evidence_ids:
+- kapur_2000
+- farde_1992
+- gerfen_surmeier_2011
+pk_timing_notes: onset_h 0, tmax_h 1, and half_life_h 2 are the shared illustration
+  timebase, not published PK, except where a field is explicitly sourced below.
+baseline_preset: pd_depleted
+simulation:
+  duration_h: 8.0
+  dt_h: 0.05
+  noise_std: 0.0
+  seed: 42
+  n_sensitivity_runs: 8
+perturbation:
+  name: D2 antagonist (haloperidol-like)
+  description: 'Negative control: parkinsonism-direction beta increase.'
+  notes: Mechanistic illustration, not a clinical claim and not a calibrated regimen.
+    potency not specified; normalized exposure shape. onset_h 0, tmax_h 1, and half_life_h
+    2 are the shared illustration timebase, not published PK, except where a field
+    is explicitly sourced below. No EC50, occupancy percent, or Cmax is copied from
+    PET studies.
+  pk:
+    onset_h: 0.0
+    tmax_h: 1.0
+    half_life_h: 2.0
+    n_doses: 1
+  modulations:
+  - target_node: d2_indirect
+    mechanism: antagonist
+    max_effect: 0.35
+    hill_coeff: 1.0
+expected:
+  worsens_beta_vs_untreated: true

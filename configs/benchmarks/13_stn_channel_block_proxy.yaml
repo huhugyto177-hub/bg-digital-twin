@@ -1,0 +1,38 @@
+name: stn_channel_block_proxy
+description: STN high-frequency stimulation-like suppression as a channel-block proxy
+  on stn_hyperdirect. Not a DBS biophysical module.
+illustration: mechanistic
+potency_note: Mechanistic illustration, not a clinical claim and not a calibrated
+  regimen. potency not specified; normalized exposure shape.
+evidence_ids:
+- benazzouz_2000
+- mcintyre_2010
+- nambu_2002
+pk_timing_notes: tmax_h 0.3 and half_life_h 8 are a stimulation-on scenario envelope,
+  not drug PK.
+baseline_preset: pd_depleted
+simulation:
+  duration_h: 8.0
+  dt_h: 0.05
+  noise_std: 0.0
+  seed: 42
+  n_sensitivity_runs: 8
+perturbation:
+  name: STN channel-block proxy
+  description: Mechanistic proxy for reduced STN output. Not a DBS waveform model.
+  notes: Mechanistic illustration, not a clinical claim and not a calibrated regimen.
+    potency not specified; normalized exposure shape. half_life_h 8 and tmax_h 0.3
+    describe a stimulation-on envelope inside the scenario, not a drug half-life or
+    Tmax.
+  pk:
+    onset_h: 0.0
+    tmax_h: 0.3
+    half_life_h: 8.0
+    n_doses: 1
+  modulations:
+  - target_node: stn_hyperdirect
+    mechanism: channel_blocker
+    max_effect: 1.6
+    hill_coeff: 1.0
+expected:
+  lowers_beta_vs_untreated: true

@@ -1,0 +1,38 @@
+name: gpr6_inverse_agonist
+description: GPR6 inverse-agonist illustration, mapped as reduced D2-MSN/indirect
+  drive (antagonist-signed gain on d2_indirect). Not calibrated.
+illustration: mechanistic
+potency_note: Mechanistic illustration, not a clinical claim and not a calibrated
+  regimen. potency not specified; normalized exposure shape.
+evidence_ids:
+- sun_2021_gpr6
+- barekatain_2024_gpr6
+pk_timing_notes: onset_h 0, tmax_h 1, and half_life_h 2 are the shared illustration
+  timebase, not published PK, except where a field is explicitly sourced below.
+baseline_preset: pd_depleted
+simulation:
+  duration_h: 8.0
+  dt_h: 0.05
+  noise_std: 0.0
+  seed: 42
+  n_sensitivity_runs: 8
+perturbation:
+  name: GPR6 inverse agonist
+  description: Reduced indirect-pathway MSN drive. Mechanistic illustration preset
+    class.
+  notes: Mechanistic illustration, not a clinical claim and not a calibrated regimen.
+    potency not specified; normalized exposure shape. onset_h 0, tmax_h 1, and half_life_h
+    2 are the shared illustration timebase, not published PK, except where a field
+    is explicitly sourced below. No CVN424 concentration or potency number is used.
+  pk:
+    onset_h: 0.0
+    tmax_h: 1.0
+    half_life_h: 2.0
+    n_doses: 1
+  modulations:
+  - target_node: d2_indirect
+    mechanism: antagonist
+    max_effect: 1.2
+    hill_coeff: 1.0
+expected:
+  lowers_beta_vs_untreated: true

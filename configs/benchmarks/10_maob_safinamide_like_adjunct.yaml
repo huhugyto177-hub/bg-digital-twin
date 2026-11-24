@@ -1,0 +1,51 @@
+name: maob_safinamide_like_adjunct
+description: 'MAO-B adjunct illustration: prolonged dopamine-tone envelope. The half-life
+  is a scenario duration, not a published safinamide or levodopa half-life.'
+illustration: mechanistic
+potency_note: Mechanistic illustration, not a clinical claim and not a calibrated
+  regimen. potency not specified; normalized exposure shape.
+evidence_ids:
+- youdim_2006
+- finberg_2016
+- loprete_2016
+- nutt_2008
+- koch_2023
+pk_timing_notes: half_life_h 8 is a scenario duration, not a published half-life.
+baseline_preset: pd_depleted
+simulation:
+  duration_h: 12.0
+  dt_h: 0.05
+  noise_std: 0.0
+  seed: 42
+  n_sensitivity_runs: 8
+  analysis_window_start_h: 0.5
+  analysis_window_end_h: 10.0
+perturbation:
+  name: MAO-B adjunct (safinamide-like)
+  description: Scenario prolongation of an L-DOPA-like dopamine-tone envelope.
+  notes: Mechanistic illustration, not a clinical claim and not a calibrated regimen.
+    potency not specified; normalized exposure shape. half_life_h 8 is a scenario
+    duration for a prolonged dopaminergic-tone envelope, not a published safinamide
+    or levodopa half-life. Loprete et al. 2016 report CL/F and Vd/F; this file does
+    not convert those into a half-life. Nutt 2008 distinguishes prolonging plasma
+    levodopa from prolonging the effect of dopamine synthesized from levodopa.
+  pk:
+    onset_h: 0.0
+    tmax_h: 1.0
+    half_life_h: 8.0
+    n_doses: 1
+  modulations:
+  - target_node: dopamine_tone
+    mechanism: agonist
+    max_effect: 0.9
+    hill_coeff: 1.0
+  - target_node: d1_direct
+    mechanism: agonist
+    max_effect: 0.45
+    hill_coeff: 1.0
+  - target_node: d2_indirect
+    mechanism: agonist
+    max_effect: 0.3
+    hill_coeff: 1.0
+expected:
+  scenario_prolonged_envelope: true

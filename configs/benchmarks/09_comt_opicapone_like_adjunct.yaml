@@ -1,0 +1,51 @@
+name: comt_opicapone_like_adjunct
+description: 'COMT-inhibitor adjunct illustration: same normalized L-DOPA-like gains
+  with a doubled illustration half-life.'
+illustration: mechanistic
+potency_note: Mechanistic illustration, not a clinical claim and not a calibrated
+  regimen. potency not specified; normalized exposure shape.
+evidence_ids:
+- ferreira_2022
+- mannisto_1999
+- contin_2010
+- koch_2023
+pk_timing_notes: "half_life_h 4 = 2 \xD7 the illustration timebase in 06, using the\
+  \ published 'at least doubled' factor from Ferreira et al. 2022. Absolute hours\
+  \ are not a measured levodopa half-life."
+baseline_preset: pd_depleted
+simulation:
+  duration_h: 12.0
+  dt_h: 0.05
+  noise_std: 0.0
+  seed: 42
+  n_sensitivity_runs: 8
+  analysis_window_start_h: 0.5
+  analysis_window_end_h: 10.0
+perturbation:
+  name: COMT adjunct (opicapone-like)
+  description: PK-shape illustration of prolonged L-DOPA-like exposure.
+  notes: Mechanistic illustration, not a clinical claim and not a calibrated regimen.
+    potency not specified; normalized exposure shape. Ferreira et al. 2022 (PMID 36054562)
+    report that opicapone 50 mg at least doubled levodopa plasma half-life. This file
+    sets half_life_h to 4, which is twice the 2 h illustration timebase in 06. The
+    absolute hours are not a published levodopa half-life. No EC50 or Cmax is asserted.
+  pk:
+    onset_h: 0.0
+    tmax_h: 1.0
+    half_life_h: 4.0
+    n_doses: 1
+  modulations:
+  - target_node: dopamine_tone
+    mechanism: agonist
+    max_effect: 0.9
+    hill_coeff: 1.0
+  - target_node: d1_direct
+    mechanism: agonist
+    max_effect: 0.45
+    hill_coeff: 1.0
+  - target_node: d2_indirect
+    mechanism: agonist
+    max_effect: 0.3
+    hill_coeff: 1.0
+expected:
+  longer_exposure_than_normalized_reference: true
