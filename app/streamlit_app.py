@@ -51,6 +51,9 @@ from src.study_design import (
     ILLUSTRATION_BANNER,
     POTENCY_NORMALIZED,
     PRESET_SPECS,
+    default_scenario_duration_h,
+    format_field_problems,
+    parse_study_design_inputs,
     preset_reference_perturbation,
     run_study_from_base,
 )
@@ -315,86 +318,102 @@ def _study_design_tab():
     cmax_ref = e2.text_input("Reference Cmax (nM)", value="", placeholder="only if you supplied an EC50")
     reference = e3.text_input("Reference dose level", value="", placeholder="e.g. 1 — the level that maps to max_effect")
     st.caption("Dose levels. Fill 3 to 5. Leave unused rows blank.")
-    labels, levels = [], []
+    dose_labels, dose_levels = [], []
     for i in range(5):
         a, b = st.columns(2)
         lab = a.text_input(f"Dose {i+1} label", value="", key=f"dose_lab_{i}", placeholder="e.g. low")
         lev = b.text_input(f"Dose {i+1} level", value="", key=f"dose_lvl_{i}", placeholder="e.g. 0.5 — example only")
-        if lab.strip() and lev.strip():
-            labels.append(lab.strip())
-            levels.append(lev.strip())
+        dose_labels.append(lab)
+        dose_levels.append(lev)
     baseline = st.selectbox("Baseline", [p.value for p in BaselinePreset], index=1, key="sd_base")
     duration = st.text_input("Duration (h)", value="", placeholder="e.g. 8 — scenario length, not a clinical interval")
+    default_duration = default_scenario_duration_h()
+    if default_duration is None:
+        st.caption("Enter Duration (h). No default scenario duration is set.")
+    else:
+        st.caption(
+            f"Leave blank to use the default scenario duration of {default_duration:g} h."
+        )
     if st.button("Run entered study", type="primary"):
-        try:
-            if not name.strip():
-                raise ValueError("Enter a candidate name.")
-            if not (3 <= len(labels) <= 5):
-                raise ValueError("Enter 3 to 5 doses (label and level).")
-            me = float(max_effect)
-            pk_kwargs = {
-                "onset_h": float(onset),
-                "tmax_h": float(tmax),
-                "half_life_h": float(half_life),
-                "n_doses": 1,
-            }
-            if ka.strip():
-                pk_kwargs["ka_per_h"] = float(ka)
-            mod = {
-                "target_node": target,
-                "mechanism": mechanism,
-                "max_effect": me,
-                "hill_coeff": 1.0,
-            }
-            use_hill = bool(ec50.strip())
-            if use_hill:
-                mod["ec50_nM"] = float(ec50)
-                if not cmax_ref.strip():
-                    raise ValueError("Hill path needs a reference Cmax that you supply.")
-                pk_kwargs["cmax_nM"] = float(cmax_ref)
-                ref_level = float(cmax_ref)
-            else:
-                if not reference.strip():
-                    raise ValueError("Enter the reference dose level (the level that maps to max_effect).")
-                ref_level = float(reference)
-            if mechanism == Mechanism.PARTIAL_AGONIST.value:
-                if not ia.strip():
-                    raise ValueError("Partial agonist needs an intrinsic-activity fraction you supply.")
-                mod["intrinsic_activity"] = float(ia)
-            elif ia.strip():
-                mod["intrinsic_activity"] = float(ia)
-            pert = MoleculePerturbation(
-                name=name.strip(),
-                notes=POTENCY_NORMALIZED if not use_hill else "EC50 and Cmax are user-supplied inputs, not predictions.",
-                pk=PKProfile(**pk_kwargs),
-                modulations=[TargetModulation(**mod)],
-            )
-            cfg = SimulationConfig(
-                baseline_preset=BaselinePreset(baseline),
-                duration_h=float(duration) if duration.strip() else 8.0,
-                dt_h=0.05,
-                noise_std=0.0,
-                seed=42,
-                n_sensitivity_runs=6,
-            )
-            params = load_baseline_params(cfg.baseline_preset)
-            study = run_study_from_base(
-                cfg,
-                pert,
-                params,
-                labels=labels,
-                levels=[float(x) for x in levels],
-                reference_level=ref_level,
-                use_hill=use_hill,
-                question=question.strip() or f"How does exposure change circuit proxies for {name.strip()}?",
-                n_uncertainty=6,
-                illustration=False,
-                potency_note="" if use_hill else POTENCY_NORMALIZED,
-            )
-            st.session_state["study"] = study
-            st.session_state["study_evidence"] = []
-        except Exception as exc:  # noqa: BLE001 — show the validation message
-            st.error(str(exc))
+        parsed = parse_study_design_inputs(
+            max_effect=max_effect,
+            onset=onset,
+            tmax=tmax,
+            half_life=half_life,
+            ka=ka,
+            ec50=ec50,
+            cmax_ref=cmax_ref,
+            reference=reference,
+            intrinsic_activity=ia,
+            mechanism=mechanism,
+            dose_labels=dose_labels,
+            dose_levels=dose_levels,
+            duration=duration,
+        )
+        if not parsed.ok:
+            st.warning(format_field_problems(parsed.problems))
+        elif not name.strip():
+            st.warning("Enter a candidate name. The study was not run.")
+        elif not (3 <= len(parsed.labels) <= 5):
+            st.warning("Enter 3 to 5 doses (label and level). The study was not run.")
+        else:
+            if parsed.used_default_duration and parsed.duration_h is not None:
+                st.info(
+                    f"Duration (h) was blank, so this run uses the default scenario duration of {parsed.duration_h:g} h."
+                )
+            try:
+                pk_kwargs = {
+                    "onset_h": parsed.onset_h,
+                    "tmax_h": parsed.tmax_h,
+                    "half_life_h": parsed.half_life_h,
+                    "n_doses": 1,
+                }
+                if parsed.ka_per_h is not None:
+                    pk_kwargs["ka_per_h"] = parsed.ka_per_h
+                mod = {
+                    "target_node": target,
+                    "mechanism": mechanism,
+                    "max_effect": parsed.max_effect,
+                    "hill_coeff": 1.0,
+                }
+                if parsed.use_hill:
+                    mod["ec50_nM"] = parsed.ec50_nM
+                    pk_kwargs["cmax_nM"] = parsed.cmax_nM
+                if parsed.intrinsic_activity is not None:
+                    mod["intrinsic_activity"] = parsed.intrinsic_activity
+                pert = MoleculePerturbation(
+                    name=name.strip(),
+                    notes=POTENCY_NORMALIZED if not parsed.use_hill else "EC50 and Cmax are user-supplied inputs, not predictions.",
+                    pk=PKProfile(**pk_kwargs),
+                    modulations=[TargetModulation(**mod)],
+                )
+                cfg = SimulationConfig(
+                    baseline_preset=BaselinePreset(baseline),
+                    duration_h=parsed.duration_h,
+                    dt_h=0.05,
+                    noise_std=0.0,
+                    seed=42,
+                    n_sensitivity_runs=6,
+                )
+                params = load_baseline_params(cfg.baseline_preset)
+                study = run_study_from_base(
+                    cfg,
+                    pert,
+                    params,
+                    labels=parsed.labels,
+                    levels=parsed.levels,
+                    reference_level=parsed.reference_level,
+                    use_hill=parsed.use_hill,
+                    question=question.strip() or f"How does exposure change circuit proxies for {name.strip()}?",
+                    n_uncertainty=6,
+                    illustration=False,
+                    potency_note="" if parsed.use_hill else POTENCY_NORMALIZED,
+                )
+                st.session_state["study"] = study
+                st.session_state["study_evidence"] = []
+            except Exception:
+                # Numbers are checked before this run. Do not show raw exception text.
+                st.warning("The study was not run. Check the entered values and try again.")
     study = st.session_state.get("study")
     if study is not None:
         _show_study(study, st.session_state.get("study_evidence"))
