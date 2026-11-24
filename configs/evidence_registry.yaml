@@ -1,86 +1,920 @@
-context_of_use: >
-  Mechanistic circuit-level translation of defined receptor/channel/pathway
-  modulations and PK exposure curves to predicted basal ganglia activity,
-  proxy LFP beta-band shifts, and motor-readiness readouts.
-calibration_note: >
-  Calibrated to *directional* consensus from the literature listed below
-  (pathway polarity, PD hypo-/hyperkinetic tendencies, L-DOPA restoration vs
-  overdrive risk, D1 vs D2 engagement, STN–GPe beta associations). The twin
-  does NOT invent binding affinity, BBB permeability, toxicity, or clinical
-  efficacy for novel structures — those must be user-supplied assay/PK
-  assumptions or left unknown.
+context_of_use: Mechanistic circuit-level translation of defined receptor/channel/pathway
+  modulations and PK exposure curves to predicted basal ganglia activity, proxy LFP
+  beta-band shifts, and motor-readiness readouts.
+calibration_note: Calibrated to directional consensus from the literature listed below
+  (pathway polarity, PD hypo-/hyperkinetic tendencies, L-DOPA restoration vs overdrive
+  risk, D1 vs D2 engagement, STN-GPe beta associations). The twin does NOT invent
+  binding affinity, BBB permeability, toxicity, or clinical efficacy for novel structures
+  — those must be user-supplied assay/PK assumptions or left unknown. New illustration
+  scenarios say when a timing value is a scenario timebase rather than a published
+  PK parameter.
 non_claims:
-  - Does not predict de novo chemical binding affinity from SMILES/structures.
-  - Does not predict blood-brain barrier permeability.
-  - Does not predict peripheral ADMET/toxicity.
-  - Does not claim clinical efficacy without experimental validation.
-  - Does not invent EC50/Cmax/half-life for newly discovered molecules; user must supply mechanistic and PK assumptions.
+- Does not predict de novo chemical binding affinity from SMILES/structures.
+- Does not predict blood-brain barrier permeability.
+- Does not predict peripheral ADMET/toxicity.
+- Does not claim clinical efficacy without experimental validation.
+- Does not invent EC50/Cmax/half-life for newly discovered molecules; user must supply
+  mechanistic and PK assumptions.
 citations:
-  - id: albin_young_penney_1989
-    parameter_keys: [w_d1_gpi, w_d2_gpe, w_stn_gpi, dopamine_tone, pathway_balance]
-    citation: "Albin RL, Young AB, Penney JB. The functional anatomy of basal ganglia disorders. Trends Neurosci. 1989;12(10):366–375."
-    assumption: "Classical direct/indirect pathway polarity underpins the mean-field skeleton."
-  - id: delong_1990
-    parameter_keys: [w_d1_gpi, w_stn_gpi, w_gpe_stn, dopamine_tone, drive_gpi]
-    citation: "DeLong MR. Primate models of movement disorders of basal ganglia origin. Trends Neurosci. 1990;13(7):281–285."
-    assumption: "Parkinsonian pathophysiology as altered rate balance informs depleted-dopamine baseline."
-  - id: delong_wichmann_2007
-    parameter_keys: [w_d1_gpi, w_stn_gpi, w_gpe_stn, dopamine_tone]
-    citation: "DeLong MR, Wichmann T. Circuits and circuit disorders of the basal ganglia. Arch Neurol. 2007;64(1):20–24."
-    assumption: "Updated classical direct/indirect/hyperdirect wiring used as mean-field skeleton."
-  - id: wichmann_delong_2016
-    parameter_keys: [drive_stn, w_stn_gpi, w_gpe_stn, beta_proxy, gpi_snr]
-    citation: "Wichmann T, DeLong MR. Deep brain stimulation for movement disorders of basal ganglia origin. Neurotherapeutics. 2016;13(2):264–283."
-    assumption: "STN/GPi as key nodes whose pathological activity tracks motor impairment."
-  - id: gerfen_surmeier_2011
-    parameter_keys: [d1_direct, d2_indirect, w_ctx_d1, w_ctx_d2]
-    citation: "Gerfen CR, Surmeier DJ. Modulation of striatal projection systems by dopamine. Annu Rev Neurosci. 2011;34:441–466."
-    assumption: "D1 vs D2 MSN modulation differentially engages direct vs indirect pathways."
-  - id: surmeier_2007_d1_d2
-    parameter_keys: [d1_direct, d2_indirect, dopamine_tone, w_ctx_d1, w_ctx_d2]
-    citation: "Surmeier DJ, et al. D1 and D2 dopamine-receptor modulation of striatal glutamatergic signaling in MSNs. Trends Neurosci. 2007;30(5):228–235."
-    assumption: "Opposite D1/D2 modulation motivates separate d1_direct and d2_indirect gain channels."
-  - id: kravitz_2010_optogenetics
-    parameter_keys: [d1_direct, d2_indirect, motor_readiness, pathway_balance]
-    citation: "Kravitz AV, et al. Regulation of parkinsonian motor behaviours by optogenetic control of basal ganglia circuitry. Nature. 2010;466(7306):622–626."
-    assumption: "Selective direct facilitation improves, indirect worsens, Parkinsonian motor readouts."
-  - id: nambu_2002_hyperdirect
-    parameter_keys: [w_ctx_stn, stn_hyperdirect, w_stn_gpi, drive_stn]
-    citation: "Nambu A, Tokuno H, Takada M. Functional significance of the cortico–subthalamo–pallidal hyperdirect pathway. Neurosci Res. 2002;43(2):111–117."
-    assumption: "Hyperdirect cortex→STN→GPi route included as a distinct gain channel."
-  - id: brown_2003_beta
-    parameter_keys: [beta_proxy, drive_stn, w_stn_gpi]
-    citation: "Brown P. Oscillatory nature of human basal ganglia activity: relationship to Parkinsonian pathophysiology. Mov Disord. 2003;18(4):357–363."
-    assumption: "Elevated beta-band activity associates with Parkinsonian states; model uses a proxy."
-  - id: hammond_2007_beta_osc
-    parameter_keys: [beta_proxy, w_gpe_stn, w_stn_gpe, drive_stn]
-    citation: "Hammond C, Bergman H, Brown P. Pathological synchronization in Parkinson's disease. Trends Neurosci. 2007;30(7):357–364."
-    assumption: "STN–GPe loops contribute to pathological beta; beta_proxy rises with STN/GPi imbalance."
-  - id: mallet_2008_stn_gpe_beta
-    parameter_keys: [beta_proxy, w_gpe_stn, w_stn_gpe, gpe, stn_hyperdirect]
-    citation: "Mallet N, et al. Parkinsonian beta oscillations in GPe and relationship with STN activity. J Neurosci. 2008;28(52):14245–14258."
-    assumption: "GPe–STN coupling influences Parkinsonian beta-related activity (directional prior)."
-  - id: contin_levodopa_pk
-    parameter_keys: [dopamine_tone, onset_h, tmax_h, half_life_h, cmax_nM]
-    citation: "Contin M, Martinelli P. Pharmacokinetics of levodopa. J Neurol. 2010;257(Suppl 2):S253–S261."
-    assumption: "Empirical L-DOPA-like exposure envelopes motivate default PK templates."
-  - id: nutt_holford_1996_ldopa_pkpd
-    parameter_keys: [dopamine_tone, motor_readiness, overdrive_index, ec50_nM]
-    citation: "Nutt JG, Holford NH. The response to levodopa in Parkinson's disease. Ann Neurol. 1996;39(5):561–573."
-    assumption: "Concentration–effect framing for motor benefit vs excess dopaminergic drive."
-  - id: obeso_2017_pd_essay
-    parameter_keys: [dopamine_tone, motor_readiness, overdrive_index]
-    citation: "Obeso JA, et al. Past, present, and future of Parkinson's disease. Mov Disord. 2017;32(9):1264–1310."
-    assumption: "DA restoration can improve motor readiness; excess drive may raise dyskinesia risk proxies."
-  - id: calabresi_2010_dyskinesia
-    parameter_keys: [overdrive_index, d1_direct, dopamine_tone, motor_readiness]
-    citation: "Calabresi P, et al. Levodopa-induced dyskinesias in Parkinson's disease. Lancet Neurol. 2010;9(11):1106–1117."
-    assumption: "Pulsatile/excessive dopaminergic stimulation links to dyskinesia; overdrive_index is a proxy."
-  - id: beste_qsp_pd_review
-    parameter_keys: [dopamine_tone, d1_direct, d2_indirect, ec50_nM, max_effect]
-    citation: "QSP framing for Parkinson's disease: PK exposure → receptor occupancy → circuit effect chains (systems pharmacology literature)."
-    assumption: "Hill/EC50 envelopes without claiming structure-based affinity prediction."
-  - id: li_jin_2023
-    parameter_keys: [d2_inverted_u_center, d2_inverted_u_width, pathway_balance, w_ctx_d1, w_ctx_d2]
-    citation: "Li H, Jin X. Multiple pathways along the cortico-basal ganglia loops control distinct aspects of action. eLife. 2023. doi:10.7554/eLife.87644.3"
-    assumption: "Triple-Control center–surround–context abstraction informs D2 inverted-U (one source among many)."
+- id: albin_1989
+  authors: Albin RL, Young AB, Penney JB
+  year: 1989
+  journal: Trends Neurosci
+  title: The functional anatomy of basal ganglia disorders.
+  parameter_keys:
+  - pathway_balance
+  - w_d1_gpi
+  - w_d2_gpe
+  citation: Albin RL, Young AB, Penney JB. The functional anatomy of basal ganglia
+    disorders. Trends Neurosci. 1989. doi:10.1016/0166-2236(89)90074-x PMID:2479133
+  assumption: Classical direct/indirect pathway polarity is the mean-field skeleton.
+  doi: 10.1016/0166-2236(89)90074-x
+  pmid: '2479133'
+- id: delong_1990
+  authors: DeLong MR
+  year: 1990
+  journal: Trends Neurosci
+  title: Primate models of movement disorders of basal ganglia origin.
+  parameter_keys:
+  - dopamine_tone
+  - drive_gpi
+  - w_stn_gpi
+  citation: DeLong MR. Primate models of movement disorders of basal ganglia origin.
+    Trends Neurosci. 1990. doi:10.1016/0166-2236(90)90110-v PMID:1695404
+  assumption: Parkinsonian rate imbalance informs the depleted-dopamine baseline.
+  doi: 10.1016/0166-2236(90)90110-v
+  pmid: '1695404'
+- id: delong_wichmann_2007
+  authors: DeLong MR, Wichmann T
+  year: 2007
+  journal: Arch Neurol
+  title: Circuits and circuit disorders of the basal ganglia.
+  parameter_keys:
+  - dopamine_tone
+  - w_stn_gpi
+  - w_gpe_stn
+  citation: DeLong MR, Wichmann T. Circuits and circuit disorders of the basal ganglia.
+    Arch Neurol. 2007. doi:10.1001/archneur.64.1.20 PMID:17210805
+  assumption: Direct, indirect, and hyperdirect wiring is the mean-field skeleton.
+  doi: 10.1001/archneur.64.1.20
+  pmid: '17210805'
+- id: wichmann_delong_2016
+  authors: Wichmann T, DeLong MR
+  year: 2016
+  journal: Neurotherapeutics
+  title: 'Deep brain stimulation for movement disorders of basal ganglia origin: restoring
+    function or functionality?'
+  parameter_keys:
+  - beta_proxy
+  - gpi_output
+  - stn_hyperdirect
+  citation: 'Wichmann T, DeLong MR. Deep brain stimulation for movement disorders
+    of basal ganglia origin: restoring function or functionality? Neurotherapeutics.
+    2016. doi:10.1007/s13311-016-0426-6 PMID:26956115'
+  assumption: STN and GPi activity are linked to motor state in a directional, not
+    clinical-claim, sense.
+  doi: 10.1007/s13311-016-0426-6
+  pmid: '26956115'
+- id: gerfen_1990
+  authors: Gerfen CR, Engber TM, Mahan LC, et al.
+  year: 1990
+  journal: Science
+  title: D1 and D2 dopamine receptor-regulated gene expression of striatonigral and
+    striatopallidal neurons.
+  parameter_keys:
+  - d1_direct
+  - d2_indirect
+  citation: Gerfen CR, Engber TM, Mahan LC, et al.. D1 and D2 dopamine receptor-regulated
+    gene expression of striatonigral and striatopallidal neurons. Science. 1990. doi:10.1126/science.2147780
+    PMID:2147780
+  assumption: D1 and D2 MSNs are separable direct and indirect populations.
+  doi: 10.1126/science.2147780
+  pmid: '2147780'
+- id: gerfen_surmeier_2011
+  authors: Gerfen CR, Surmeier DJ
+  year: 2011
+  journal: Annu Rev Neurosci
+  title: Modulation of striatal projection systems by dopamine.
+  parameter_keys:
+  - d1_direct
+  - d2_indirect
+  - dopamine_tone
+  citation: Gerfen CR, Surmeier DJ. Modulation of striatal projection systems by dopamine.
+    Annu Rev Neurosci. 2011. doi:10.1146/annurev-neuro-061010-113641 PMID:21469956
+  assumption: Dopamine modulates direct and indirect projection systems in opposite
+    directions.
+  doi: 10.1146/annurev-neuro-061010-113641
+  pmid: '21469956'
+- id: surmeier_2007
+  authors: Surmeier DJ, Ding J, Day M, Wang Z, Shen W
+  year: 2007
+  journal: Trends Neurosci
+  title: D1 and D2 dopamine-receptor modulation of striatal glutamatergic signaling
+    in striatal medium spiny neurons.
+  parameter_keys:
+  - d1_direct
+  - d2_indirect
+  citation: Surmeier DJ, Ding J, Day M, Wang Z, Shen W. D1 and D2 dopamine-receptor
+    modulation of striatal glutamatergic signaling in striatal medium spiny neurons.
+    Trends Neurosci. 2007. doi:10.1016/j.tins.2007.03.008 PMID:17408758
+  assumption: Opposite D1 versus D2 modulation motivates separate gain channels.
+  doi: 10.1016/j.tins.2007.03.008
+  pmid: '17408758'
+- id: kravitz_2010
+  authors: Kravitz AV, Freeze BS, Parker PRL, et al.
+  year: 2010
+  journal: Nature
+  title: Regulation of parkinsonian motor behaviours by optogenetic control of basal
+    ganglia circuitry.
+  parameter_keys:
+  - motor_readiness
+  - pathway_balance
+  - d1_direct
+  - d2_indirect
+  citation: Kravitz AV, Freeze BS, Parker PRL, et al.. Regulation of parkinsonian
+    motor behaviours by optogenetic control of basal ganglia circuitry. Nature. 2010.
+    doi:10.1038/nature09159 PMID:20613723
+  assumption: Selective pathway activation changes parkinsonian motor readouts in
+    opposite directions. The twin does not claim the optogenetic result as efficacy.
+  doi: 10.1038/nature09159
+  pmid: '20613723'
+- id: nambu_2002
+  authors: Nambu A, Tokuno H, Takada M
+  year: 2002
+  journal: Neurosci Res
+  title: Functional significance of the cortico-subthalamo-pallidal hyperdirect pathway.
+  parameter_keys:
+  - stn_hyperdirect
+  - w_ctx_stn
+  citation: Nambu A, Tokuno H, Takada M. Functional significance of the cortico-subthalamo-pallidal
+    hyperdirect pathway. Neurosci Res. 2002. doi:10.1016/s0168-0102(02)00027-5 PMID:12067746
+  assumption: Cortex to STN to GPi is a distinct gain channel.
+  doi: 10.1016/s0168-0102(02)00027-5
+  pmid: '12067746'
+- id: brown_2003
+  authors: Brown P
+  year: 2003
+  journal: Mov Disord
+  title: 'Oscillatory nature of human basal ganglia activity: relationship to the
+    pathophysiology of Parkinson''s disease.'
+  parameter_keys:
+  - beta_proxy
+  citation: 'Brown P. Oscillatory nature of human basal ganglia activity: relationship
+    to the pathophysiology of Parkinson''s disease. Mov Disord. 2003. doi:10.1002/mds.10358
+    PMID:12671940'
+  assumption: Elevated beta-band activity is associated with parkinsonian state. The
+    model uses a proxy, not a spectrum.
+  doi: 10.1002/mds.10358
+  pmid: '12671940'
+- id: brown_2001
+  authors: Brown P, Oliviero A, Mazzone P, Insola A, Tonali P, Di Lazzaro V
+  year: 2001
+  journal: J Neurosci
+  title: Dopamine dependency of oscillations between subthalamic nucleus and pallidum
+    in Parkinson's disease.
+  parameter_keys:
+  - beta_proxy
+  - dopamine_tone
+  citation: Brown P, Oliviero A, Mazzone P, Insola A, Tonali P, Di Lazzaro V. Dopamine
+    dependency of oscillations between subthalamic nucleus and pallidum in Parkinson's
+    disease. J Neurosci. 2001. doi:10.1523/JNEUROSCI.21-03-01033.2001 PMID:11157088
+  assumption: Beta-range STN-pallidum coupling depends on dopamine state, directionally.
+  doi: 10.1523/JNEUROSCI.21-03-01033.2001
+  pmid: '11157088'
+- id: hammond_2007
+  authors: Hammond C, Bergman H, Brown P
+  year: 2007
+  journal: Trends Neurosci
+  title: 'Pathological synchronization in Parkinson''s disease: networks, models and
+    treatments.'
+  parameter_keys:
+  - beta_proxy
+  - stn_gpe_coupling
+  citation: 'Hammond C, Bergman H, Brown P. Pathological synchronization in Parkinson''s
+    disease: networks, models and treatments. Trends Neurosci. 2007. doi:10.1016/j.tins.2007.05.004
+    PMID:17532060'
+  assumption: STN-GPe synchronization contributes to pathological beta. The proxy
+    is not a measured LFP.
+  doi: 10.1016/j.tins.2007.05.004
+  pmid: '17532060'
+- id: mallet_2008
+  authors: Mallet N, Pogosyan A, Marton LF, Bolam JP, Brown P, Magill PJ
+  year: 2008
+  journal: J Neurosci
+  title: Parkinsonian beta oscillations in the external globus pallidus and their
+    relationship with subthalamic nucleus activity.
+  parameter_keys:
+  - beta_proxy
+  - stn_gpe_coupling
+  - gpe
+  citation: Mallet N, Pogosyan A, Marton LF, Bolam JP, Brown P, Magill PJ. Parkinsonian
+    beta oscillations in the external globus pallidus and their relationship with
+    subthalamic nucleus activity. J Neurosci. 2008. doi:10.1523/jneurosci.4199-08.2008
+    PMID:19109506
+  assumption: GPe-STN coupling is a directional prior for the beta proxy.
+  doi: 10.1523/jneurosci.4199-08.2008
+  pmid: '19109506'
+- id: bevan_2002
+  authors: Bevan MD, Magill PJ, Terman D, Bolam JP, Wilson CJ
+  year: 2002
+  journal: Trends Neurosci
+  title: 'Move to the rhythm: oscillations in the subthalamic nucleus-external globus
+    pallidus network.'
+  parameter_keys:
+  - stn_gpe_coupling
+  - beta_proxy
+  citation: 'Bevan MD, Magill PJ, Terman D, Bolam JP, Wilson CJ. Move to the rhythm:
+    oscillations in the subthalamic nucleus-external globus pallidus network. Trends
+    Neurosci. 2002. doi:10.1016/s0166-2236(02)02235-x PMID:12220881'
+  assumption: The STN-GPe loop can generate rhythmic activity used as a prior for
+    the coupling term.
+  doi: 10.1016/s0166-2236(02)02235-x
+  pmid: '12220881'
+- id: bevan_wilson_1999
+  authors: Bevan MD, Wilson CJ
+  year: 1999
+  journal: J Neurosci
+  title: Mechanisms underlying spontaneous oscillation and rhythmic firing in rat
+    subthalamic neurons.
+  parameter_keys:
+  - stn_hyperdirect
+  citation: Bevan MD, Wilson CJ. Mechanisms underlying spontaneous oscillation and
+    rhythmic firing in rat subthalamic neurons. J Neurosci. 1999. doi:10.1523/jneurosci.19-17-07617.1999
+    PMID:10460267
+  assumption: STN neurons can fire rhythmically. The model is a rate proxy, not that
+    biophysics.
+  doi: 10.1523/jneurosci.19-17-07617.1999
+  pmid: '10460267'
+- id: magill_2001
+  authors: Magill PJ, Bolam JP, Bevan MD
+  year: 2001
+  journal: Neuroscience
+  title: Dopamine regulates the impact of the cerebral cortex on the subthalamic nucleus-globus
+    pallidus network.
+  parameter_keys:
+  - dopamine_tone
+  - stn_gpe_coupling
+  citation: Magill PJ, Bolam JP, Bevan MD. Dopamine regulates the impact of the cerebral
+    cortex on the subthalamic nucleus-globus pallidus network. Neuroscience. 2001.
+    doi:10.1016/s0306-4522(01)00281-0 PMID:11566503
+  assumption: Dopamine changes cortical drive through the STN-GPe network, directionally.
+  doi: 10.1016/s0306-4522(01)00281-0
+  pmid: '11566503'
+- id: plenz_1999
+  authors: Plenz D, Kital ST
+  year: 1999
+  journal: Nature
+  title: A basal ganglia pacemaker formed by the subthalamic nucleus and external
+    globus pallidus.
+  parameter_keys:
+  - stn_gpe_coupling
+  citation: Plenz D, Kital ST. A basal ganglia pacemaker formed by the subthalamic
+    nucleus and external globus pallidus. Nature. 1999. doi:10.1038/23281 PMID:10458164
+  assumption: An STN-GPe assembly can act as a pacemaker. The coupling term is a rate
+    proxy of that idea.
+  doi: 10.1038/23281
+  pmid: '10458164'
+- id: kuhn_2006
+  authors: Kühn AA, Kupsch A, Schneider GH, Brown P
+  year: 2006
+  journal: Eur J Neurosci
+  title: Reduction in subthalamic 8-35 Hz oscillatory activity correlates with clinical
+    improvement in Parkinson's disease.
+  parameter_keys:
+  - beta_proxy
+  - beta_suppression
+  citation: Kühn AA, Kupsch A, Schneider GH, Brown P. Reduction in subthalamic 8-35
+    Hz oscillatory activity correlates with clinical improvement in Parkinson's disease.
+    Eur J Neurosci. 2006. doi:10.1111/j.1460-9568.2006.04717.x PMID:16623853
+  assumption: Lower STN beta-range activity has been associated with motor improvement.
+    The percent change here is a model proxy, not that clinical correlation.
+  doi: 10.1111/j.1460-9568.2006.04717.x
+  pmid: '16623853'
+- id: kuhn_2009
+  authors: Kühn AA, Tsui A, Aziz T, et al.
+  year: 2009
+  journal: Exp Neurol
+  title: Pathological synchronisation in the subthalamic nucleus of patients with
+    Parkinson's disease relates to both bradykinesia and rigidity.
+  parameter_keys:
+  - beta_proxy
+  - motor_readiness
+  citation: Kühn AA, Tsui A, Aziz T, et al.. Pathological synchronisation in the subthalamic
+    nucleus of patients with Parkinson's disease relates to both bradykinesia and
+    rigidity. Exp Neurol. 2009. doi:10.1016/j.expneurol.2008.11.008 PMID:19070616
+  assumption: STN synchrony relates to bradykinesia and rigidity in a directional
+    prior. The twin does not predict clinical scores.
+  doi: 10.1016/j.expneurol.2008.11.008
+  pmid: '19070616'
+- id: little_2013
+  authors: Little S, Pogosyan A, Neal S, et al.
+  year: 2013
+  journal: Ann Neurol
+  title: Adaptive deep brain stimulation in advanced Parkinson disease.
+  parameter_keys:
+  - beta_proxy
+  citation: Little S, Pogosyan A, Neal S, et al.. Adaptive deep brain stimulation
+    in advanced Parkinson disease. Ann Neurol. 2013. doi:10.1002/ana.23951 PMID:23852650
+  assumption: Beta has been used as a feedback biomarker. This model does not implement
+    adaptive stimulation.
+  doi: 10.1002/ana.23951
+  pmid: '23852650'
+- id: little_brown_2014
+  authors: Little S, Brown P
+  year: 2014
+  journal: Parkinsonism Relat Disord
+  title: The functional role of beta oscillations in Parkinson's disease.
+  parameter_keys:
+  - beta_proxy
+  citation: Little S, Brown P. The functional role of beta oscillations in Parkinson's
+    disease. Parkinsonism Relat Disord. 2014. doi:10.1016/S1353-8020(13)70013-0 PMID:24262186
+  assumption: Beta is discussed as a functional marker. The readout remains a dimensionless
+    proxy.
+  doi: 10.1016/S1353-8020(13)70013-0
+  pmid: '24262186'
+- id: neumann_2016
+  authors: Neumann WJ, Degen K, Schneider GH, et al.
+  year: 2016
+  journal: Mov Disord
+  title: Subthalamic synchronized oscillatory activity correlates with motor impairment
+    in patients with Parkinson's disease.
+  parameter_keys:
+  - beta_proxy
+  - motor_readiness
+  citation: Neumann WJ, Degen K, Schneider GH, et al.. Subthalamic synchronized oscillatory
+    activity correlates with motor impairment in patients with Parkinson's disease.
+    Mov Disord. 2016. doi:10.1002/mds.26759 PMID:27548068
+  assumption: STN oscillatory activity correlates with motor impairment. The twin
+    does not reproduce that correlation.
+  doi: 10.1002/mds.26759
+  pmid: '27548068'
+- id: bergman_1990
+  authors: Bergman H, Wichmann T, DeLong MR
+  year: 1990
+  journal: Science
+  title: Reversal of experimental parkinsonism by lesions of the subthalamic nucleus.
+  parameter_keys:
+  - stn_hyperdirect
+  citation: Bergman H, Wichmann T, DeLong MR. Reversal of experimental parkinsonism
+    by lesions of the subthalamic nucleus. Science. 1990. doi:10.1126/science.2402638
+    PMID:2402638
+  assumption: Reducing STN output can relieve experimental parkinsonism, the directional
+    prior for an STN channel-block proxy.
+  doi: 10.1126/science.2402638
+  pmid: '2402638'
+- id: contin_2010
+  authors: Contin M, Martinelli P
+  year: 2010
+  journal: J Neurol
+  title: Pharmacokinetics of levodopa.
+  parameter_keys:
+  - onset_h
+  - half_life_h
+  - dopamine_tone
+  citation: Contin M, Martinelli P. Pharmacokinetics of levodopa. J Neurol. 2010.
+    doi:10.1007/s00415-010-5728-8 PMID:21080186
+  assumption: Levodopa plasma half-life is very short and fluctuations track concentration.
+    This file does not copy an unstated numeric half-life into new scenarios.
+  doi: 10.1007/s00415-010-5728-8
+  pmid: '21080186'
+- id: nutt_2008
+  authors: Nutt JG
+  year: 2008
+  journal: Mov Disord
+  title: Pharmacokinetics and pharmacodynamics of levodopa.
+  parameter_keys:
+  - dopamine_tone
+  - motor_readiness
+  - on_time
+  citation: Nutt JG. Pharmacokinetics and pharmacodynamics of levodopa. Mov Disord.
+    2008. doi:10.1002/mds.22037 PMID:18781675
+  assumption: Short plasma half-life and the short-duration response motivate exposure-shape
+    illustrations. Not dosing advice.
+  doi: 10.1002/mds.22037
+  pmid: '18781675'
+- id: nutt_holford_1996
+  authors: Nutt JG, Holford NH
+  year: 1996
+  journal: Ann Neurol
+  title: 'The response to levodopa in Parkinson''s disease: imposing pharmacological
+    law and order.'
+  parameter_keys:
+  - motor_readiness
+  - overdrive_index
+  citation: 'Nutt JG, Holford NH. The response to levodopa in Parkinson''s disease:
+    imposing pharmacological law and order. Ann Neurol. 1996. doi:10.1002/ana.410390504
+    PMID:8619540'
+  assumption: Short-duration and long-duration responses are distinguished. No numeric
+    EC50 from this paper is entered as a model potency.
+  doi: 10.1002/ana.410390504
+  pmid: '8619540'
+- id: obeso_2017
+  authors: Obeso JA, Stamelou M, Goetz CG, et al.
+  year: 2017
+  journal: Mov Disord
+  title: Past, present, and future of Parkinson's disease.
+  parameter_keys:
+  - dopamine_tone
+  - motor_readiness
+  - overdrive_index
+  citation: Obeso JA, Stamelou M, Goetz CG, et al.. Past, present, and future of Parkinson's
+    disease. Mov Disord. 2017. doi:10.1002/mds.27115 PMID:28887905
+  assumption: Dopamine restoration and excess drive are both part of the clinical
+    picture. The overdrive index is only a proxy.
+  doi: 10.1002/mds.27115
+  pmid: '28887905'
+- id: calabresi_2010
+  authors: Calabresi P, Di Filippo M, Ghiglieri V, Tambasco N, Picconi B
+  year: 2010
+  journal: Lancet Neurol
+  title: 'Levodopa-induced dyskinesias in patients with Parkinson''s disease: filling
+    the bench-to-bedside gap.'
+  parameter_keys:
+  - overdrive_index
+  - d1_direct
+  citation: 'Calabresi P, Di Filippo M, Ghiglieri V, Tambasco N, Picconi B. Levodopa-induced
+    dyskinesias in patients with Parkinson''s disease: filling the bench-to-bedside
+    gap. Lancet Neurol. 2010. doi:10.1016/S1474-4422(10)70218-0 PMID:20880751'
+  assumption: Excess dopaminergic stimulation is linked to dyskinesia. overdrive_index
+    is not a clinical rating.
+  doi: 10.1016/S1474-4422(10)70218-0
+  pmid: '20880751'
+- id: jenner_2008
+  authors: Jenner P
+  year: 2008
+  journal: Nat Rev Neurosci
+  title: Molecular mechanisms of L-DOPA-induced dyskinesia.
+  parameter_keys:
+  - overdrive_index
+  citation: Jenner P. Molecular mechanisms of L-DOPA-induced dyskinesia. Nat Rev Neurosci.
+    2008. doi:10.1038/nrn2471 PMID:18714325
+  assumption: LID has circuit and synaptic mechanisms. The overdrive index does not
+    claim to measure them.
+  doi: 10.1038/nrn2471
+  pmid: '18714325'
+- id: picconi_2003
+  authors: Picconi B, Centonze D, Hakansson K, et al.
+  year: 2003
+  journal: Nat Neurosci
+  title: Loss of bidirectional striatal synaptic plasticity in L-DOPA-induced dyskinesia.
+  parameter_keys:
+  - overdrive_index
+  - d1_direct
+  citation: Picconi B, Centonze D, Hakansson K, et al.. Loss of bidirectional striatal
+    synaptic plasticity in L-DOPA-induced dyskinesia. Nat Neurosci. 2003. doi:10.1038/nn1040
+    PMID:12665799
+  assumption: Striatal plasticity changes accompany LID. The proxy does not model
+    spike-timing plasticity.
+  doi: 10.1038/nn1040
+  pmid: '12665799'
+- id: schwarzschild_2006
+  authors: Schwarzschild MA, Agnati L, Fuxe K, Chen JF, Morelli M
+  year: 2006
+  journal: Trends Neurosci
+  title: Targeting adenosine A2A receptors in Parkinson's disease.
+  parameter_keys:
+  - d2_indirect
+  citation: Schwarzschild MA, Agnati L, Fuxe K, Chen JF, Morelli M. Targeting adenosine
+    A2A receptors in Parkinson's disease. Trends Neurosci. 2006. doi:10.1016/j.tins.2006.09.004
+    PMID:17030429
+  assumption: A2A receptors on indirect-pathway neurons are a directional prior for
+    an indirect-pathway illustration.
+  doi: 10.1016/j.tins.2006.09.004
+  pmid: '17030429'
+- id: mizuno_2013
+  authors: Mizuno Y, Kondo T
+  year: 2013
+  journal: Mov Disord
+  title: Adenosine A2A receptor antagonist istradefylline reduces daily OFF time in
+    Parkinson's disease.
+  parameter_keys:
+  - off_time
+  - d2_indirect
+  citation: Mizuno Y, Kondo T. Adenosine A2A receptor antagonist istradefylline reduces
+    daily OFF time in Parkinson's disease. Mov Disord. 2013. doi:10.1002/mds.25418
+    PMID:23483627
+  assumption: An A2A antagonist has been studied as an adjunct. Reported OFF-time
+    hours are not copied into the model.
+  doi: 10.1002/mds.25418
+  pmid: '23483627'
+- id: youdim_2006
+  authors: Youdim MB, Edmondson D, Tipton KF
+  year: 2006
+  journal: Nat Rev Neurosci
+  title: The therapeutic potential of monoamine oxidase inhibitors.
+  parameter_keys:
+  - dopamine_tone
+  citation: Youdim MB, Edmondson D, Tipton KF. The therapeutic potential of monoamine
+    oxidase inhibitors. Nat Rev Neurosci. 2006. doi:10.1038/nrn1883 PMID:16552415
+  assumption: MAO inhibition is a dopaminergic-tone mechanism class. No clinical effect
+    size is asserted.
+  doi: 10.1038/nrn1883
+  pmid: '16552415'
+- id: finberg_2016
+  authors: Finberg JP, Rabey JM
+  year: 2016
+  journal: Front Pharmacol
+  title: Inhibitors of MAO-A and MAO-B in psychiatry and neurology.
+  parameter_keys:
+  - dopamine_tone
+  citation: Finberg JP, Rabey JM. Inhibitors of MAO-A and MAO-B in psychiatry and
+    neurology. Front Pharmacol. 2016. doi:10.3389/fphar.2016.00340 PMID:27803666
+  assumption: MAO-B inhibition is distinguished from other monoamine mechanisms. The
+    scenario envelope is not a published half-life.
+  doi: 10.3389/fphar.2016.00340
+  pmid: '27803666'
+- id: mannisto_1999
+  authors: Männistö PT, Kaakkola S
+  year: 1999
+  journal: Pharmacol Rev
+  title: 'Catechol-O-methyltransferase (COMT): biochemistry, molecular biology, pharmacology,
+    and clinical efficacy of the new selective COMT inhibitors.'
+  parameter_keys:
+  - half_life_h
+  - dopamine_tone
+  citation: 'Männistö PT, Kaakkola S. Catechol-O-methyltransferase (COMT): biochemistry,
+    molecular biology, pharmacology, and clinical efficacy of the new selective COMT
+    inhibitors. Pharmacol Rev. 1999. PMID:10581325'
+  assumption: COMT inhibition is a class that can extend levodopa availability. This
+    entry does not supply a numeric half-life.
+  pmid: '10581325'
+- id: ferreira_2022
+  authors: Ferreira JJ, Poewe W, Rascol O, et al.
+  year: 2022
+  journal: Mov Disord
+  title: Effect of opicapone on levodopa pharmacokinetics in patients with fluctuating
+    Parkinson's disease.
+  parameter_keys:
+  - half_life_h
+  citation: Ferreira JJ, Poewe W, Rascol O, et al.. Effect of opicapone on levodopa
+    pharmacokinetics in patients with fluctuating Parkinson's disease. Mov Disord.
+    2022. doi:10.1002/mds.29193 PMID:36054562
+  assumption: Opicapone 50 mg at least doubled levodopa plasma half-life in that study.
+    Absolute hours in the illustration are a doubled timebase, not a published levodopa
+    half-life, and clinical OFF changes are not copied.
+  doi: 10.1002/mds.29193
+  pmid: '36054562'
+- id: loprete_2016
+  authors: Loprete L, Leuratti C, Cattaneo C, Thapar MM, Farrell C, Sardina M
+  year: 2016
+  journal: Pharmacol Res Perspect
+  title: Population pharmacokinetic and pharmacodynamic analyses of safinamide in
+    subjects with Parkinson's disease.
+  parameter_keys:
+  - dopamine_tone
+  citation: Loprete L, Leuratti C, Cattaneo C, Thapar MM, Farrell C, Sardina M. Population
+    pharmacokinetic and pharmacodynamic analyses of safinamide in subjects with Parkinson's
+    disease. Pharmacol Res Perspect. 2016. doi:10.1002/prp2.251 PMID:27713822
+  assumption: Safinamide population PK was reported as CL/F, Vd/F, and ka. This project
+    does not convert those into a half-life claim.
+  doi: 10.1002/prp2.251
+  pmid: '27713822'
+- id: wright_1997
+  authors: Wright CE, Sisson TL, Ichhpurani AK, Peters GR
+  year: 1997
+  journal: J Clin Pharmacol
+  title: Steady-state pharmacokinetic properties of pramipexole in healthy volunteers.
+  parameter_keys:
+  - half_life_h
+  citation: Wright CE, Sisson TL, Ichhpurani AK, Peters GR. Steady-state pharmacokinetic
+    properties of pramipexole in healthy volunteers. J Clin Pharmacol. 1997. doi:10.1002/j.1552-4604.1997.tb04330.x
+    PMID:9208359
+  assumption: Mean pramipexole elimination half-life was 12.9 h. Tmax and potency
+    are not taken from this abstract.
+  doi: 10.1002/j.1552-4604.1997.tb04330.x
+  pmid: '9208359'
+- id: kaye_2000
+  authors: Kaye CM, Nicholls B
+  year: 2000
+  journal: Clin Pharmacokinet
+  title: Clinical pharmacokinetics of ropinirole.
+  parameter_keys:
+  - half_life_h
+  - d2_indirect
+  citation: Kaye CM, Nicholls B. Clinical pharmacokinetics of ropinirole. Clin Pharmacokinet.
+    2000. doi:10.2165/00003088-200039040-00001 PMID:11069211
+  assumption: Ropinirole elimination half-life is approximately 6 h in that review.
+    The pramipexole-like scenario does not use this number.
+  doi: 10.2165/00003088-200039040-00001
+  pmid: '11069211'
+- id: rascol_2000
+  authors: Rascol O, Brooks DJ, Korczyn AD, De Deyn PP, Clarke CE, Lang AE
+  year: 2000
+  journal: N Engl J Med
+  title: A five-year study of the incidence of dyskinesia in patients with early Parkinson's
+    disease who were treated with ropinirole or levodopa.
+  parameter_keys:
+  - d2_indirect
+  - overdrive_index
+  citation: Rascol O, Brooks DJ, Korczyn AD, De Deyn PP, Clarke CE, Lang AE. A five-year
+    study of the incidence of dyskinesia in patients with early Parkinson's disease
+    who were treated with ropinirole or levodopa. N Engl J Med. 2000. doi:10.1056/nejm200005183422004
+    PMID:10816186
+  assumption: A D2-agonist class has been compared with levodopa. Dyskinesia rates
+    from the trial are not model outputs.
+  doi: 10.1056/nejm200005183422004
+  pmid: '10816186'
+- id: kapur_2000
+  authors: Kapur S, Zipursky R, Jones C, Remington G, Houle S
+  year: 2000
+  journal: Am J Psychiatry
+  title: Relationship between dopamine D2 occupancy, clinical response, and side effects.
+  parameter_keys:
+  - d2_indirect
+  citation: Kapur S, Zipursky R, Jones C, Remington G, Houle S. Relationship between
+    dopamine D2 occupancy, clinical response, and side effects. Am J Psychiatry. 2000.
+    doi:10.1176/appi.ajp.157.4.514 PMID:10739409
+  assumption: D2 occupancy has been related to motor side effects. Occupancy percents
+    are not used as EC50.
+  doi: 10.1176/appi.ajp.157.4.514
+  pmid: '10739409'
+- id: farde_1992
+  authors: Farde L, Nordström AL, Wiesel FA, Pauli S, Halldin C, Sedvall G
+  year: 1992
+  journal: Arch Gen Psychiatry
+  title: Positron emission tomographic analysis of central D1 and D2 dopamine receptor
+    occupancy in patients treated with classical neuroleptics and clozapine.
+  parameter_keys:
+  - d2_indirect
+  citation: Farde L, Nordström AL, Wiesel FA, Pauli S, Halldin C, Sedvall G. Positron
+    emission tomographic analysis of central D1 and D2 dopamine receptor occupancy
+    in patients treated with classical neuroleptics and clozapine. Arch Gen Psychiatry.
+    1992. doi:10.1001/archpsyc.1992.01820070032005 PMID:1352677
+  assumption: Classical D2 antagonists occupy striatal D2 receptors and can produce
+    extrapyramidal effects. No occupancy number is used as a potency.
+  doi: 10.1001/archpsyc.1992.01820070032005
+  pmid: '1352677'
+- id: verhagen_1998
+  authors: Verhagen Metman L, Del Dotto P, van den Munckhof P, Fang J, Mouradian MM,
+    Chase TN
+  year: 1998
+  journal: Neurology
+  title: Amantadine as treatment for dyskinesias and motor fluctuations in Parkinson's
+    disease.
+  parameter_keys:
+  - stn_hyperdirect
+  - overdrive_index
+  citation: Verhagen Metman L, Del Dotto P, van den Munckhof P, Fang J, Mouradian
+    MM, Chase TN. Amantadine as treatment for dyskinesias and motor fluctuations in
+    Parkinson's disease. Neurology. 1998. doi:10.1212/wnl.50.5.1323 PMID:9595981
+  assumption: Amantadine has been studied for dyskinesia and fluctuations. The scenario
+    is an STN channel-block proxy, not that trial's outcome.
+  doi: 10.1212/wnl.50.5.1323
+  pmid: '9595981'
+- id: aoki_1988
+  authors: Aoki FY, Sitar DS
+  year: 1988
+  journal: Clin Pharmacokinet
+  title: Clinical pharmacokinetics of amantadine hydrochloride.
+  parameter_keys:
+  - half_life_h
+  citation: Aoki FY, Sitar DS. Clinical pharmacokinetics of amantadine hydrochloride.
+    Clin Pharmacokinet. 1988. doi:10.2165/00003088-198814010-00003 PMID:3280212
+  assumption: Amantadine PK has been reviewed. The abstract does not provide a half-life
+    used by the scenario, so the illustration timebase is used instead.
+  doi: 10.2165/00003088-198814010-00003
+  pmid: '3280212'
+- id: benazzouz_2000
+  authors: Benazzouz A, Hallett M
+  year: 2000
+  journal: Neurology
+  title: Mechanism of action of deep brain stimulation.
+  parameter_keys:
+  - stn_hyperdirect
+  citation: Benazzouz A, Hallett M. Mechanism of action of deep brain stimulation.
+    Neurology. 2000. PMID:11188968
+  assumption: DBS mechanisms include changes in STN output. The channel-block file
+    is a proxy, not a DBS model.
+  pmid: '11188968'
+- id: mcintyre_2010
+  authors: McIntyre CC, Hahn PJ
+  year: 2010
+  journal: Neurobiol Dis
+  title: Network perspectives on the mechanisms of deep brain stimulation.
+  parameter_keys:
+  - stn_hyperdirect
+  citation: McIntyre CC, Hahn PJ. Network perspectives on the mechanisms of deep brain
+    stimulation. Neurobiol Dis. 2010. doi:10.1016/j.nbd.2009.09.022 PMID:19804831
+  assumption: Network effects of DBS are broader than a single channel block. The
+    proxy does not implement those networks.
+  doi: 10.1016/j.nbd.2009.09.022
+  pmid: '19804831'
+- id: elife_action_selection_2023
+  authors: ''
+  year: 2023
+  journal: eLife
+  title: Multiple dynamic interactions from basal ganglia direct and indirect pathways
+    mediate action selection.
+  parameter_keys:
+  - pathway_balance
+  - d2_inverted_u_center
+  - d1_direct
+  - d2_indirect
+  citation: Multiple dynamic interactions from basal ganglia direct and indirect pathways
+    mediate action selection. eLife. 2023. doi:10.7554/eLife.87644 PMID:37751468
+  assumption: Direct and indirect pathway interactions inform pathway balance. Personal
+    names are omitted from this rendered entry. One circuit paper among many.
+  doi: 10.7554/eLife.87644
+  pmid: '37751468'
+- id: jin_2014
+  authors: Jin X, Tecuapetla F, Costa RM
+  year: 2014
+  journal: Nat Neurosci
+  title: Basal ganglia subcircuits distinctively encode the parsing and concatenation
+    of action sequences.
+  parameter_keys:
+  - pathway_balance
+  citation: Jin X, Tecuapetla F, Costa RM. Basal ganglia subcircuits distinctively
+    encode the parsing and concatenation of action sequences. Nat Neurosci. 2014.
+    doi:10.1038/nn.3632 PMID:24464039
+  assumption: Basal ganglia subcircuits contribute differently to action sequences.
+    A rate model does not encode sequences.
+  doi: 10.1038/nn.3632
+  pmid: '24464039'
+- id: tecuapetla_2016
+  authors: Tecuapetla F, Jin X, Lima SQ, Costa RM
+  year: 2016
+  journal: Cell
+  title: Complementary contributions of striatal projection pathways to action initiation
+    and execution.
+  parameter_keys:
+  - d1_direct
+  - d2_indirect
+  - pathway_balance
+  citation: Tecuapetla F, Jin X, Lima SQ, Costa RM. Complementary contributions of
+    striatal projection pathways to action initiation and execution. Cell. 2016. doi:10.1016/j.cell.2016.06.032
+    PMID:27453468
+  assumption: Direct and indirect pathways make complementary contributions to actions.
+  doi: 10.1016/j.cell.2016.06.032
+  pmid: '27453468'
+- id: marshall_2016
+  authors: Marshall S, Burghaus R, Cosson V, et al.
+  year: 2016
+  journal: CPT Pharmacometrics Syst Pharmacol
+  title: 'Good practices in model-informed drug discovery and development: practice,
+    application, and documentation.'
+  parameter_keys:
+  - exposure_response
+  citation: 'Marshall S, Burghaus R, Cosson V, et al.. Good practices in model-informed
+    drug discovery and development: practice, application, and documentation. CPT
+    Pharmacometrics Syst Pharmacol. 2016. doi:10.1002/psp4.12049 PMID:27069774'
+  assumption: MIDD practice is to separate assumptions, uncertainty, and decisions.
+    This tool does not claim a regulatory MIDD package.
+  doi: 10.1002/psp4.12049
+  pmid: '27069774'
+- id: vander_graaf_2011
+  authors: van der Graaf PH, Benson N
+  year: 2011
+  journal: Pharm Res
+  title: 'Systems pharmacology: bridging systems biology and pharmacokinetics-pharmacodynamics
+    (PKPD) in drug discovery and development.'
+  parameter_keys:
+  - exposure_response
+  - ec50_nM
+  citation: 'van der Graaf PH, Benson N. Systems pharmacology: bridging systems biology
+    and pharmacokinetics-pharmacodynamics (PKPD) in drug discovery and development.
+    Pharm Res. 2011. doi:10.1007/s11095-011-0467-9 PMID:21560018'
+  assumption: Systems pharmacology links exposure to effect. EC50 here is user-supplied
+    or omitted.
+  doi: 10.1007/s11095-011-0467-9
+  pmid: '21560018'
+- id: ribba_2017
+  authors: Ribba B, Grimm HP, Agoram B, et al.
+  year: 2017
+  journal: CPT Pharmacometrics Syst Pharmacol
+  title: 'Methodologies for quantitative systems pharmacology (QSP) models: design
+    and estimation.'
+  parameter_keys:
+  - exposure_response
+  citation: 'Ribba B, Grimm HP, Agoram B, et al.. Methodologies for quantitative systems
+    pharmacology (QSP) models: design and estimation. CPT Pharmacometrics Syst Pharmacol.
+    2017. doi:10.1002/psp4.12206 PMID:28585415'
+  assumption: QSP models are assumptions plus estimation. This mean-field is not a
+    fitted QSP model.
+  doi: 10.1002/psp4.12206
+  pmid: '28585415'
+- id: rose_2022
+  authors: Rose R, Mitchell E, Van Der Graaf P, et al.
+  year: 2022
+  journal: J Pharmacokinet Pharmacodyn
+  title: 'A quantitative systems pharmacology model for simulating OFF-Time in augmentation
+    trials for Parkinson''s disease: application to preladenant.'
+  parameter_keys:
+  - off_time
+  - exposure_response
+  - beta_proxy
+  citation: 'Rose R, Mitchell E, Van Der Graaf P, et al.. A quantitative systems pharmacology
+    model for simulating OFF-Time in augmentation trials for Parkinson''s disease:
+    application to preladenant. J Pharmacokinet Pharmacodyn. 2022. doi:10.1007/s10928-022-09825-9
+    PMID:36209447'
+  assumption: Exposure-response and OFF-time style readouts are a QSP framing. Minute-level
+    predictions from that paper are not copied.
+  doi: 10.1007/s10928-022-09825-9
+  pmid: '36209447'
+- id: bezard_2024
+  authors: Bezard E, Gray D, Kozak R, Leoni M, Combs C, Duvvuri S
+  year: 2024
+  journal: CNS Neurol Disord Drug Targets
+  title: Rationale and development of tavapadon, a D1/D5-selective partial dopamine
+    agonist for the treatment of Parkinson's disease.
+  parameter_keys:
+  - d1_direct
+  - intrinsic_activity
+  citation: Bezard E, Gray D, Kozak R, Leoni M, Combs C, Duvvuri S. Rationale and
+    development of tavapadon, a D1/D5-selective partial dopamine agonist for the treatment
+    of Parkinson's disease. CNS Neurol Disord Drug Targets. 2024. doi:10.2174/1871527322666230331121028
+    PMID:36999711
+  assumption: D1/D5 partial agonism is a pharmacological class. No intrinsic-activity
+    number from this paper is used.
+  doi: 10.2174/1871527322666230331121028
+  pmid: '36999711'
+- id: young_2020_partial_d1
+  authors: Young D, Popiolek M, Trapa P, et al.
+  year: 2020
+  journal: ACS Chem Neurosci
+  title: D1 agonist improved movement of parkinsonian nonhuman primates with limited
+    dyskinesia side effects.
+  parameter_keys:
+  - d1_direct
+  - intrinsic_activity
+  citation: Young D, Popiolek M, Trapa P, et al.. D1 agonist improved movement of
+    parkinsonian nonhuman primates with limited dyskinesia side effects. ACS Chem
+    Neurosci. 2020. doi:10.1021/acschemneuro.9b00589 PMID:31971364
+  assumption: A partial D1 agonist has been studied preclinically. The primate result
+    is not claimed, and no potency is copied.
+  doi: 10.1021/acschemneuro.9b00589
+  pmid: '31971364'
+- id: koch_2023
+  authors: Koch J
+  year: 2023
+  journal: Ment Health Clin
+  title: Management of OFF condition in Parkinson disease.
+  parameter_keys:
+  - off_time
+  - dopamine_tone
+  citation: Koch J. Management of OFF condition in Parkinson disease. Ment Health
+    Clin. 2023. doi:10.9740/mhc.2023.12.289 PMID:38058599
+  assumption: COMT, MAO-B, and A2A adjuncts are discussed as OFF-management classes.
+    Clinical OFF changes are not model outputs.
+  doi: 10.9740/mhc.2023.12.289
+  pmid: '38058599'
+- id: sun_2021_gpr6
+  authors: Sun H, Monenschein H, Schiffer HH, et al.
+  year: 2021
+  journal: J Med Chem
+  title: First-time disclosure of CVN424, a potent and selective GPR6 inverse agonist
+    for the treatment of Parkinson's disease.
+  parameter_keys:
+  - d2_indirect
+  citation: Sun H, Monenschein H, Schiffer HH, et al.. First-time disclosure of CVN424,
+    a potent and selective GPR6 inverse agonist for the treatment of Parkinson's disease.
+    J Med Chem. 2021. doi:10.1021/acs.jmedchem.0c02081 PMID:33861086
+  assumption: GPR6 inverse agonism is a published indirect-pathway pharmacology class.
+    No potency from this paper is entered.
+  doi: 10.1021/acs.jmedchem.0c02081
+  pmid: '33861086'
+- id: barekatain_2024_gpr6
+  authors: Barekatain M, Johansson LC, Lam JH, et al.
+  year: 2024
+  journal: Sci Signal
+  title: Structural insights into the high basal activity and inverse agonism of the
+    orphan receptor GPR6 implicated in Parkinson's disease.
+  parameter_keys:
+  - d2_indirect
+  citation: Barekatain M, Johansson LC, Lam JH, et al.. Structural insights into the
+    high basal activity and inverse agonism of the orphan receptor GPR6 implicated
+    in Parkinson's disease. Sci Signal. 2024. doi:10.1126/scisignal.ado8741 PMID:39626010
+  assumption: GPR6 is an orphan receptor with inverse agonism discussed in Parkinson's
+    research. The scenario only reduces indirect-pathway drive.
+  doi: 10.1126/scisignal.ado8741
+  pmid: '39626010'
+- id: ungerstedt_1970
+  authors: Ungerstedt U, Arbuthnott GW
+  year: 1970
+  journal: Brain Res
+  title: Quantitative recording of rotational behavior in rats after 6-hydroxy-dopamine
+    lesions of the nigrostriatal dopamine system.
+  parameter_keys:
+  - dopamine_tone
+  citation: Ungerstedt U, Arbuthnott GW. Quantitative recording of rotational behavior
+    in rats after 6-hydroxy-dopamine lesions of the nigrostriatal dopamine system.
+    Brain Res. 1970. doi:10.1016/0006-8993(70)90187-3 PMID:5494536
+  assumption: Unilateral 6-OHDA lesion is a classical preclinical preparation. The
+    suggestion text does not reproduce lesion methods.
+  doi: 10.1016/0006-8993(70)90187-3
+  pmid: '5494536'
+- id: cenci_lundblad_2007
+  authors: Cenci MA, Lundblad M
+  year: 2007
+  journal: Curr Protoc Neurosci
+  title: Ratings of L-DOPA-induced dyskinesia in the unilateral 6-OHDA lesion model
+    of Parkinson's disease in rats and mice.
+  parameter_keys:
+  - overdrive_index
+  citation: Cenci MA, Lundblad M. Ratings of L-DOPA-induced dyskinesia in the unilateral
+    6-OHDA lesion model of Parkinson's disease in rats and mice. Curr Protoc Neurosci.
+    2007. doi:10.1002/0471142301.ns0925s41 PMID:18428668
+  assumption: LID ratings exist for the 6-OHDA model. overdrive_index is not that
+    rating scale, and the suggestion is not a protocol.
+  doi: 10.1002/0471142301.ns0925s41
+  pmid: '18428668'

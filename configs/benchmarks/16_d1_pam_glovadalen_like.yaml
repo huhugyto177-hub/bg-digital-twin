@@ -1,0 +1,37 @@
+name: d1_pam_glovadalen_like
+description: D1 PAM illustration (glovadalen-like). Gain is scaled by baseline dopamine
+  tone. No published glovadalen PK or potency is used.
+illustration: mechanistic
+potency_note: Mechanistic illustration, not a clinical claim and not a calibrated
+  regimen. potency not specified; normalized exposure shape.
+evidence_ids:
+- rose_2022
+pk_timing_notes: onset_h 0, tmax_h 1, and half_life_h 2 are the shared illustration
+  timebase, not published PK, except where a field is explicitly sourced below.
+baseline_preset: pd_depleted
+simulation:
+  duration_h: 8.0
+  dt_h: 0.05
+  noise_std: 0.0
+  seed: 42
+  n_sensitivity_runs: 8
+perturbation:
+  name: D1 PAM (glovadalen-like)
+  description: PAM gain is multiplied by baseline dopamine_tone.
+  notes: Mechanistic illustration, not a clinical claim and not a calibrated regimen.
+    potency not specified; normalized exposure shape. onset_h 0, tmax_h 1, and half_life_h
+    2 are the shared illustration timebase, not published PK, except where a field
+    is explicitly sourced below. No verified glovadalen EC50, Cmax, or half-life was
+    entered. A conference abstract without a DOI or PMID was not added to the registry.
+  pk:
+    onset_h: 0.0
+    tmax_h: 1.0
+    half_life_h: 2.0
+    n_doses: 1
+  modulations:
+  - target_node: d1_direct
+    mechanism: pam
+    max_effect: 3.0
+    hill_coeff: 1.0
+expected:
+  pam_depends_on_endogenous_tone: true

@@ -1,0 +1,39 @@
+name: d2_agonist_pramipexole_like
+description: D2/D3 agonist (pramipexole-like) mechanistic illustration. Elimination
+  half-life from Wright 1997; Tmax is not that paper's Tmax.
+illustration: mechanistic
+potency_note: Mechanistic illustration, not a clinical claim and not a calibrated
+  regimen. potency not specified; normalized exposure shape.
+evidence_ids:
+- wright_1997
+- kaye_2000
+- rascol_2000
+- gerfen_surmeier_2011
+pk_timing_notes: 'half_life_h 12.9 h: Wright et al. 1997 mean elimination half-life
+  (PMID 9208359). tmax_h 1.0 h is the illustration timebase, not a published Tmax.'
+baseline_preset: pd_depleted
+simulation:
+  duration_h: 8.0
+  dt_h: 0.05
+  noise_std: 0.0
+  seed: 42
+  n_sensitivity_runs: 8
+perturbation:
+  name: D2/D3 agonist (pramipexole-like)
+  description: Illustration of a D2-node agonist gain.
+  notes: Mechanistic illustration, not a clinical claim and not a calibrated regimen.
+    potency not specified; normalized exposure shape. half_life_h 12.9 is the mean
+    elimination half-life reported by Wright et al. 1997 (PMID 9208359). tmax_h 1.0
+    is the illustration timebase, not a published Tmax. No EC50 or Cmax is asserted.
+  pk:
+    onset_h: 0.0
+    tmax_h: 1.0
+    half_life_h: 12.9
+    n_doses: 1
+  modulations:
+  - target_node: d2_indirect
+    mechanism: agonist
+    max_effect: 1.0
+    hill_coeff: 1.0
+expected:
+  lowers_beta_vs_untreated: true

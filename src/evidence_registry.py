@@ -1,7 +1,7 @@
 """Structured citation registry linking parameters to peer-reviewed literature.
 
 The twin is calibrated to *directional* consensus across classical CBGT / PD /
-dopaminergic pharmacology / QSP / LFP-beta sources. Triple-Control (Li & Jin)
+dopaminergic pharmacology / QSP / LFP-beta sources. One 2023 circuit paper
 is one entry among many — not the sole foundation.
 
 Does NOT invent binding affinity, BBB permeability, or clinical efficacy for
@@ -230,29 +230,26 @@ DEFAULT_EVIDENCE: dict[str, Any] = {
             ),
         },
         {
-            "id": "beste_qsp_pd_review",
-            "parameter_keys": [
-                "dopamine_tone",
-                "d1_direct",
-                "d2_indirect",
-                "ec50_nM",
-                "max_effect",
-            ],
+            "id": "rose_2022_offtime_qsp",
+            "parameter_keys": ["off_time", "exposure_response", "beta_proxy"],
+            "authors": "Rose R, Mitchell E, Van Der Graaf P, et al.",
+            "year": 2022,
+            "journal": "J Pharmacokinet Pharmacodyn",
+            "doi": "10.1007/s10928-022-09825-9",
+            "pmid": "36209447",
             "citation": (
-                "Bakshi S, et al. Mathematical systems pharmacology and "
-                "quantitative systems pharmacology approaches for Parkinson's "
-                "disease (representative QSP framing). CPT Pharmacometrics Syst "
-                "Pharmacol. / related QSP literature synthesizing DA–receptor–"
-                "circuit response chains."
+                "Rose R, et al. A quantitative systems pharmacology model for "
+                "simulating OFF-Time in augmentation trials for Parkinson's "
+                "disease: application to preladenant. J Pharmacokinet Pharmacodyn. "
+                "2022;49(6):593-606. doi:10.1007/s10928-022-09825-9"
             ),
             "assumption": (
-                "QSP-style separation of PK exposure → receptor occupancy → "
-                "circuit effect motivates Hill/EC50 envelopes without claiming "
-                "structure-based affinity prediction."
+                "Methodological framing for an exposure sweep and an OFF-time style "
+                "readout. This twin does not reproduce that paper's minute-level predictions."
             ),
         },
         {
-            "id": "li_jin_2023",
+            "id": "elife_action_selection_2023",
             "parameter_keys": [
                 "d2_inverted_u_center",
                 "d2_inverted_u_width",
@@ -260,14 +257,19 @@ DEFAULT_EVIDENCE: dict[str, Any] = {
                 "w_ctx_d1",
                 "w_ctx_d2",
             ],
+            "authors": "",
+            "year": 2023,
+            "journal": "eLife",
+            "doi": "10.7554/eLife.87644",
+            "pmid": "37751468",
             "citation": (
-                "Li H, Jin X. Multiple pathways along the cortico-basal ganglia "
-                "loops control distinct aspects of action. eLife. 2023. "
-                "doi:10.7554/eLife.87644.3"
+                "Multiple dynamic interactions from basal ganglia direct and "
+                "indirect pathways mediate action selection. eLife. 2023. "
+                "doi:10.7554/eLife.87644"
             ),
             "assumption": (
-                "Triple-Control center–surround–context abstraction informs D2 "
-                "inverted-U and pathway decomposition (one source among many)."
+                "Direct/indirect pathway interactions inform pathway decomposition "
+                "(one circuit paper among many). Rendered citation omits personal names."
             ),
         },
     ],
@@ -330,6 +332,73 @@ def references_markdown(registry: dict[str, Any] | None = None) -> str:
         assum = row["assumption"].replace("|", "\\|")
         lines.append(f"| {row['id']} | {row['parameters']} | {cite} | {assum} |")
     lines.append("")
+    return "\n".join(lines)
+
+
+def _citation_line(item: dict) -> str:
+    authors = (item.get("authors") or "").strip()
+    year = item.get("year")
+    journal = item.get("journal") or ""
+    head = " ".join(p for p in (authors, str(year) if year else "", journal) if p).strip()
+    if not head:
+        head = item.get("citation", "")
+        head = head[:180]
+    doi = item.get("doi") or ""
+    pmid = item.get("pmid") or ""
+    link = f"https://doi.org/{doi}" if doi else (f"https://pubmed.ncbi.nlm.nih.gov/{pmid}" if pmid else "")
+    if link:
+        return f"{head}. {link}"
+    return head
+
+
+def select_citations(
+    registry: dict[str, Any] | None = None,
+    parameter_keys: list[str] | None = None,
+    evidence_ids: list[str] | None = None,
+    limit: int = 8,
+) -> tuple[list[dict], int]:
+    """Citations that support a figure: named ids first, then parameter-key matches."""
+    reg = registry or load_evidence_registry()
+    items = list(reg.get("citations", []))
+    by_id = {c.get("id"): c for c in items}
+    chosen: list[dict] = []
+    seen: set[str] = set()
+
+    def add(item: dict | None) -> None:
+        if not item:
+            return
+        cid = item.get("id", "")
+        if cid in seen:
+            return
+        seen.add(cid)
+        chosen.append(item)
+
+    for cid in evidence_ids or []:
+        add(by_id.get(cid))
+    keys = set(parameter_keys or [])
+    if keys:
+        for item in items:
+            if keys.intersection(item.get("parameter_keys") or []):
+                add(item)
+    extra = max(0, len(chosen) - limit)
+    return chosen[:limit], extra
+
+
+def evidence_caption(
+    registry: dict[str, Any] | None = None,
+    parameter_keys: list[str] | None = None,
+    evidence_ids: list[str] | None = None,
+    limit: int = 8,
+) -> str:
+    """Compact Evidence caption: author/year/journal and a DOI or PMID link."""
+    chosen, extra = select_citations(registry, parameter_keys, evidence_ids, limit=limit)
+    if not chosen:
+        return "Evidence: no registry entry matched this figure."
+    lines = ["**Evidence** (mechanistic sources, not an efficacy claim):"]
+    for item in chosen:
+        lines.append(f"- {_citation_line(item)}")
+    if extra:
+        lines.append(f"- +{extra} more matching entries are in the registry table.")
     return "\n".join(lines)
 
 
