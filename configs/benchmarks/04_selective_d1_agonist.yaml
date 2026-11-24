@@ -1,0 +1,27 @@
+name: selective_d1_agonist
+description: Selective D1 direct-pathway agonist on PD baseline (distinct from combined DA restoration).
+baseline_preset: pd_depleted
+simulation:
+  duration_h: 8.0
+  dt_h: 0.05
+  noise_std: 0.0
+  seed: 42
+  n_sensitivity_runs: 20
+perturbation:
+  name: Selective D1 agonist
+  description: Preferential D1/direct-pathway facilitation without broad D2/DA tone restoration.
+  notes: Mechanism scenario for pathway decomposition comparison vs L-DOPA.
+  pk:
+    onset_h: 0.2
+    tmax_h: 1.0
+    half_life_h: 2.0
+    cmax_nM: 120.0
+    n_doses: 1
+  modulations:
+    - target_node: d1_direct
+      mechanism: agonist
+      max_effect: 0.95
+      ec50_nM: 40.0
+      hill_coeff: 1.3
+expected:
+  distinct_pathway_vs_ldopa: true

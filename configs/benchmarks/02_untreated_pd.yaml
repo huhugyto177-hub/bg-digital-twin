@@ -1,0 +1,12 @@
+name: untreated_pd
+description: Dopamine-depleted Parkinsonian circuit without treatment.
+baseline_preset: pd_depleted
+simulation:
+  duration_h: 8.0
+  dt_h: 0.05
+  noise_std: 0.0
+  seed: 42
+  n_sensitivity_runs: 20
+perturbation: null
+expected:
+  vs_healthy: higher_beta_lower_motor

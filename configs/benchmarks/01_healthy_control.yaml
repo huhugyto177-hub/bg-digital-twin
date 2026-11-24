@@ -1,0 +1,12 @@
+name: healthy_control
+description: Healthy basal ganglia baseline with no pharmacological perturbation.
+baseline_preset: healthy
+simulation:
+  duration_h: 8.0
+  dt_h: 0.05
+  noise_std: 0.0
+  seed: 42
+  n_sensitivity_runs: 20
+perturbation: null
+expected:
+  notes: Reference healthy beta and motor readiness for directional comparisons.

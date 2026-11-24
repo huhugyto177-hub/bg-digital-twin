@@ -1,0 +1,37 @@
+name: ldopa_standard
+description: Standard L-DOPA–like combined dopaminergic tone restoration on PD baseline.
+baseline_preset: pd_depleted
+simulation:
+  duration_h: 8.0
+  dt_h: 0.05
+  noise_std: 0.0
+  seed: 42
+  n_sensitivity_runs: 20
+perturbation:
+  name: L-DOPA standard
+  description: Combined DA tone restoration approximating standard levodopa exposure.
+  notes: Empirical PK envelope only; not a clinical dosing recommendation.
+  pk:
+    onset_h: 0.25
+    tmax_h: 1.2
+    half_life_h: 1.5
+    cmax_nM: 800.0
+    n_doses: 1
+  modulations:
+    - target_node: dopamine_tone
+      mechanism: agonist
+      max_effect: 0.85
+      ec50_nM: 250.0
+      hill_coeff: 1.2
+    - target_node: d1_direct
+      mechanism: agonist
+      max_effect: 0.35
+      ec50_nM: 300.0
+      hill_coeff: 1.0
+    - target_node: d2_indirect
+      mechanism: agonist
+      max_effect: 0.25
+      ec50_nM: 300.0
+      hill_coeff: 1.0
+expected:
+  restores_motor_suppresses_beta: true

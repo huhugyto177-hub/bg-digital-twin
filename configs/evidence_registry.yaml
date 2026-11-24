@@ -1,0 +1,86 @@
+context_of_use: >
+  Mechanistic circuit-level translation of defined receptor/channel/pathway
+  modulations and PK exposure curves to predicted basal ganglia activity,
+  proxy LFP beta-band shifts, and motor-readiness readouts.
+calibration_note: >
+  Calibrated to *directional* consensus from the literature listed below
+  (pathway polarity, PD hypo-/hyperkinetic tendencies, L-DOPA restoration vs
+  overdrive risk, D1 vs D2 engagement, STN–GPe beta associations). The twin
+  does NOT invent binding affinity, BBB permeability, toxicity, or clinical
+  efficacy for novel structures — those must be user-supplied assay/PK
+  assumptions or left unknown.
+non_claims:
+  - Does not predict de novo chemical binding affinity from SMILES/structures.
+  - Does not predict blood-brain barrier permeability.
+  - Does not predict peripheral ADMET/toxicity.
+  - Does not claim clinical efficacy without experimental validation.
+  - Does not invent EC50/Cmax/half-life for newly discovered molecules; user must supply mechanistic and PK assumptions.
+citations:
+  - id: albin_young_penney_1989
+    parameter_keys: [w_d1_gpi, w_d2_gpe, w_stn_gpi, dopamine_tone, pathway_balance]
+    citation: "Albin RL, Young AB, Penney JB. The functional anatomy of basal ganglia disorders. Trends Neurosci. 1989;12(10):366–375."
+    assumption: "Classical direct/indirect pathway polarity underpins the mean-field skeleton."
+  - id: delong_1990
+    parameter_keys: [w_d1_gpi, w_stn_gpi, w_gpe_stn, dopamine_tone, drive_gpi]
+    citation: "DeLong MR. Primate models of movement disorders of basal ganglia origin. Trends Neurosci. 1990;13(7):281–285."
+    assumption: "Parkinsonian pathophysiology as altered rate balance informs depleted-dopamine baseline."
+  - id: delong_wichmann_2007
+    parameter_keys: [w_d1_gpi, w_stn_gpi, w_gpe_stn, dopamine_tone]
+    citation: "DeLong MR, Wichmann T. Circuits and circuit disorders of the basal ganglia. Arch Neurol. 2007;64(1):20–24."
+    assumption: "Updated classical direct/indirect/hyperdirect wiring used as mean-field skeleton."
+  - id: wichmann_delong_2016
+    parameter_keys: [drive_stn, w_stn_gpi, w_gpe_stn, beta_proxy, gpi_snr]
+    citation: "Wichmann T, DeLong MR. Deep brain stimulation for movement disorders of basal ganglia origin. Neurotherapeutics. 2016;13(2):264–283."
+    assumption: "STN/GPi as key nodes whose pathological activity tracks motor impairment."
+  - id: gerfen_surmeier_2011
+    parameter_keys: [d1_direct, d2_indirect, w_ctx_d1, w_ctx_d2]
+    citation: "Gerfen CR, Surmeier DJ. Modulation of striatal projection systems by dopamine. Annu Rev Neurosci. 2011;34:441–466."
+    assumption: "D1 vs D2 MSN modulation differentially engages direct vs indirect pathways."
+  - id: surmeier_2007_d1_d2
+    parameter_keys: [d1_direct, d2_indirect, dopamine_tone, w_ctx_d1, w_ctx_d2]
+    citation: "Surmeier DJ, et al. D1 and D2 dopamine-receptor modulation of striatal glutamatergic signaling in MSNs. Trends Neurosci. 2007;30(5):228–235."
+    assumption: "Opposite D1/D2 modulation motivates separate d1_direct and d2_indirect gain channels."
+  - id: kravitz_2010_optogenetics
+    parameter_keys: [d1_direct, d2_indirect, motor_readiness, pathway_balance]
+    citation: "Kravitz AV, et al. Regulation of parkinsonian motor behaviours by optogenetic control of basal ganglia circuitry. Nature. 2010;466(7306):622–626."
+    assumption: "Selective direct facilitation improves, indirect worsens, Parkinsonian motor readouts."
+  - id: nambu_2002_hyperdirect
+    parameter_keys: [w_ctx_stn, stn_hyperdirect, w_stn_gpi, drive_stn]
+    citation: "Nambu A, Tokuno H, Takada M. Functional significance of the cortico–subthalamo–pallidal hyperdirect pathway. Neurosci Res. 2002;43(2):111–117."
+    assumption: "Hyperdirect cortex→STN→GPi route included as a distinct gain channel."
+  - id: brown_2003_beta
+    parameter_keys: [beta_proxy, drive_stn, w_stn_gpi]
+    citation: "Brown P. Oscillatory nature of human basal ganglia activity: relationship to Parkinsonian pathophysiology. Mov Disord. 2003;18(4):357–363."
+    assumption: "Elevated beta-band activity associates with Parkinsonian states; model uses a proxy."
+  - id: hammond_2007_beta_osc
+    parameter_keys: [beta_proxy, w_gpe_stn, w_stn_gpe, drive_stn]
+    citation: "Hammond C, Bergman H, Brown P. Pathological synchronization in Parkinson's disease. Trends Neurosci. 2007;30(7):357–364."
+    assumption: "STN–GPe loops contribute to pathological beta; beta_proxy rises with STN/GPi imbalance."
+  - id: mallet_2008_stn_gpe_beta
+    parameter_keys: [beta_proxy, w_gpe_stn, w_stn_gpe, gpe, stn_hyperdirect]
+    citation: "Mallet N, et al. Parkinsonian beta oscillations in GPe and relationship with STN activity. J Neurosci. 2008;28(52):14245–14258."
+    assumption: "GPe–STN coupling influences Parkinsonian beta-related activity (directional prior)."
+  - id: contin_levodopa_pk
+    parameter_keys: [dopamine_tone, onset_h, tmax_h, half_life_h, cmax_nM]
+    citation: "Contin M, Martinelli P. Pharmacokinetics of levodopa. J Neurol. 2010;257(Suppl 2):S253–S261."
+    assumption: "Empirical L-DOPA-like exposure envelopes motivate default PK templates."
+  - id: nutt_holford_1996_ldopa_pkpd
+    parameter_keys: [dopamine_tone, motor_readiness, overdrive_index, ec50_nM]
+    citation: "Nutt JG, Holford NH. The response to levodopa in Parkinson's disease. Ann Neurol. 1996;39(5):561–573."
+    assumption: "Concentration–effect framing for motor benefit vs excess dopaminergic drive."
+  - id: obeso_2017_pd_essay
+    parameter_keys: [dopamine_tone, motor_readiness, overdrive_index]
+    citation: "Obeso JA, et al. Past, present, and future of Parkinson's disease. Mov Disord. 2017;32(9):1264–1310."
+    assumption: "DA restoration can improve motor readiness; excess drive may raise dyskinesia risk proxies."
+  - id: calabresi_2010_dyskinesia
+    parameter_keys: [overdrive_index, d1_direct, dopamine_tone, motor_readiness]
+    citation: "Calabresi P, et al. Levodopa-induced dyskinesias in Parkinson's disease. Lancet Neurol. 2010;9(11):1106–1117."
+    assumption: "Pulsatile/excessive dopaminergic stimulation links to dyskinesia; overdrive_index is a proxy."
+  - id: beste_qsp_pd_review
+    parameter_keys: [dopamine_tone, d1_direct, d2_indirect, ec50_nM, max_effect]
+    citation: "QSP framing for Parkinson's disease: PK exposure → receptor occupancy → circuit effect chains (systems pharmacology literature)."
+    assumption: "Hill/EC50 envelopes without claiming structure-based affinity prediction."
+  - id: li_jin_2023
+    parameter_keys: [d2_inverted_u_center, d2_inverted_u_width, pathway_balance, w_ctx_d1, w_ctx_d2]
+    citation: "Li H, Jin X. Multiple pathways along the cortico-basal ganglia loops control distinct aspects of action. eLife. 2023. doi:10.7554/eLife.87644.3"
+    assumption: "Triple-Control center–surround–context abstraction informs D2 inverted-U (one source among many)."
