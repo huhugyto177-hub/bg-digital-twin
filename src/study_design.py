@@ -10,6 +10,7 @@ Hill path (user-supplied EC50 and Cmax): dose levels scale Cmax and EC50 is fixe
 
 from __future__ import annotations
 
+import math
 from dataclasses import dataclass, field
 from typing import Optional
 
@@ -237,6 +238,258 @@ def run_study_from_base(
     )
 
 
+@dataclass(frozen=True)
+class ParsedNumber:
+    """One free-text number from the study design form."""
+
+    value: float | None = None
+    blank: bool = False
+    invalid: bool = False
+
+
+@dataclass(frozen=True)
+class FieldProblem:
+    """A study-design field the run should name instead of executing."""
+
+    field: str
+    reason: str
+
+
+@dataclass(frozen=True)
+class ResolvedDuration:
+    """Scenario length after applying the blank-duration fallback."""
+
+    hours: float | None
+    used_default: bool
+    problem: FieldProblem | None = None
+
+
+@dataclass(frozen=True)
+class StudyDesignInputs:
+    """Numbers parsed from the Study design form. ``ok`` is false when the run must stop."""
+
+    max_effect: float | None
+    onset_h: float | None
+    tmax_h: float | None
+    half_life_h: float | None
+    ka_per_h: float | None
+    ec50_nM: float | None
+    cmax_nM: float | None
+    reference_level: float | None
+    intrinsic_activity: float | None
+    labels: list[str]
+    levels: list[float]
+    duration_h: float | None
+    used_default_duration: bool
+    use_hill: bool
+    problems: list[FieldProblem]
+
+    @property
+    def ok(self) -> bool:
+        return not self.problems
+
+
+def parse_numeric_field(raw: str | None) -> ParsedNumber:
+    """Parse one free-text number.
+
+    Blank and whitespace-only input is missing. Anything that is not a finite
+    number (including NaN and infinity) is invalid. This is the only converter
+    the Study design form uses for numeric free-text fields.
+    """
+    if raw is None:
+        return ParsedNumber(blank=True)
+    text = str(raw).strip()
+    if text == "":
+        return ParsedNumber(blank=True)
+    try:
+        value = float(text)
+    except (TypeError, ValueError):
+        return ParsedNumber(invalid=True)
+    if not math.isfinite(value):
+        return ParsedNumber(invalid=True)
+    return ParsedNumber(value=value)
+
+
+def default_scenario_duration_h() -> float | None:
+    """Existing ``SimulationConfig.duration_h`` default, or None if it is unset.
+
+    The benchmark loader uses this same number when a file omits duration.
+    No new numeric default is introduced here.
+    """
+    default = SimulationConfig.model_fields["duration_h"].default
+    if isinstance(default, bool) or not isinstance(default, (int, float)):
+        return None
+    value = float(default)
+    if not math.isfinite(value) or value <= 0:
+        return None
+    return value
+
+
+def resolve_scenario_duration(raw: str | None, field: str = "Duration (h)") -> ResolvedDuration:
+    """Blank duration uses the existing scenario default. Invalid duration does not run."""
+    parsed = parse_numeric_field(raw)
+    if parsed.invalid:
+        return ResolvedDuration(None, False, FieldProblem(field, "invalid"))
+    if parsed.blank:
+        default = default_scenario_duration_h()
+        if default is None:
+            return ResolvedDuration(None, False, FieldProblem(field, "blank"))
+        return ResolvedDuration(default, True, None)
+    assert parsed.value is not None
+    if parsed.value <= 0:
+        return ResolvedDuration(None, False, FieldProblem(field, "positive"))
+    return ResolvedDuration(parsed.value, False, None)
+
+
+def _read_form_number(
+    raw: str | None,
+    field: str,
+    problems: list[FieldProblem],
+    *,
+    required: bool,
+    rule: str | None = None,
+) -> float | None:
+    parsed = parse_numeric_field(raw)
+    if parsed.blank:
+        if required:
+            problems.append(FieldProblem(field, "blank"))
+        return None
+    if parsed.invalid or parsed.value is None:
+        problems.append(FieldProblem(field, "invalid"))
+        return None
+    value = parsed.value
+    if rule == "positive" and value <= 0:
+        problems.append(FieldProblem(field, "positive"))
+        return None
+    if rule == "nonnegative" and value < 0:
+        problems.append(FieldProblem(field, "nonnegative"))
+        return None
+    if rule == "unit_interval" and not (0.0 < value <= 1.0):
+        problems.append(FieldProblem(field, "unit_interval"))
+        return None
+    return value
+
+
+def parse_study_design_inputs(
+    *,
+    max_effect: str,
+    onset: str,
+    tmax: str,
+    half_life: str,
+    ka: str,
+    ec50: str,
+    cmax_ref: str,
+    reference: str,
+    intrinsic_activity: str,
+    mechanism: str,
+    dose_labels: list[str],
+    dose_levels: list[str],
+    duration: str,
+) -> StudyDesignInputs:
+    """Parse the Study design form. Problems name fields; they do not raise."""
+    problems: list[FieldProblem] = []
+    max_effect_v = _read_form_number(
+        max_effect, "max_effect at the reference dose", problems, required=True
+    )
+    needs_ia = mechanism == Mechanism.PARTIAL_AGONIST.value
+    intrinsic = _read_form_number(
+        intrinsic_activity,
+        "Intrinsic activity (required for partial agonist)",
+        problems,
+        required=needs_ia,
+        rule="unit_interval",
+    )
+    onset_h = _read_form_number(onset, "Onset (h)", problems, required=True, rule="nonnegative")
+    tmax_h = _read_form_number(tmax, "Tmax (h)", problems, required=True, rule="positive")
+    half_life_h = _read_form_number(
+        half_life, "Half-life (h)", problems, required=True, rule="positive"
+    )
+    ka_per_h = _read_form_number(ka, "ka (1/h, optional)", problems, required=False, rule="positive")
+    before_ec50 = len(problems)
+    ec50_nM = _read_form_number(
+        ec50, "EC50 (nM, optional)", problems, required=False, rule="positive"
+    )
+    ec50_problem = len(problems) > before_ec50
+    use_hill = ec50_nM is not None
+    cmax_nM = _read_form_number(
+        cmax_ref,
+        "Reference Cmax (nM)",
+        problems,
+        required=use_hill,
+        rule="positive",
+    )
+    reference_v = _read_form_number(
+        reference,
+        "Reference dose level",
+        problems,
+        required=not use_hill and not ec50_problem,
+        rule="positive",
+    )
+    labels: list[str] = []
+    levels: list[float] = []
+    n_rows = max(len(dose_labels), len(dose_levels))
+    for i in range(n_rows):
+        label = (dose_labels[i] if i < len(dose_labels) else "").strip()
+        raw_level = dose_levels[i] if i < len(dose_levels) else ""
+        parsed_level = parse_numeric_field(raw_level)
+        if not label and parsed_level.blank:
+            continue
+        if not label:
+            problems.append(FieldProblem(f"Dose {i + 1} label", "label"))
+        level_field = f"Dose {i + 1} level"
+        if parsed_level.blank:
+            problems.append(FieldProblem(level_field, "blank"))
+            continue
+        if parsed_level.invalid or parsed_level.value is None:
+            problems.append(FieldProblem(level_field, "invalid"))
+            continue
+        if parsed_level.value <= 0:
+            problems.append(FieldProblem(level_field, "positive"))
+            continue
+        if label:
+            labels.append(label)
+            levels.append(parsed_level.value)
+    resolved = resolve_scenario_duration(duration)
+    if resolved.problem is not None:
+        problems.append(resolved.problem)
+    return StudyDesignInputs(
+        max_effect=max_effect_v,
+        onset_h=onset_h,
+        tmax_h=tmax_h,
+        half_life_h=half_life_h,
+        ka_per_h=ka_per_h,
+        ec50_nM=ec50_nM,
+        cmax_nM=cmax_nM if use_hill else None,
+        reference_level=cmax_nM if use_hill else reference_v,
+        intrinsic_activity=intrinsic,
+        labels=labels,
+        levels=levels,
+        duration_h=resolved.hours,
+        used_default_duration=resolved.used_default,
+        use_hill=use_hill,
+        problems=problems,
+    )
+
+
+_PROBLEM_CLAUSE = {
+    "blank": "is blank",
+    "invalid": "is not a number",
+    "positive": "must be a positive number",
+    "nonnegative": "must be zero or positive",
+    "unit_interval": "must be greater than 0 and at most 1",
+    "label": "is blank",
+}
+
+
+def format_field_problems(problems: list[FieldProblem]) -> str:
+    """Friendly warning text. Names fields and never includes a Python exception."""
+    if not problems:
+        return ""
+    parts = [f"{item.field} {_PROBLEM_CLAUSE[item.reason]}" for item in problems]
+    joined = "; ".join(parts)
+    return f"Check the study design form: {joined}. The study was not run."
+
+
 def parse_user_levels(
     labels: list[str],
     raw_levels: list[str],
@@ -247,18 +500,24 @@ def parse_user_levels(
     labels = [lb.strip() for lb in labels]
     if any(not lb for lb in labels):
         raise ValueError("Each dose needs a label.")
-    try:
-        levels = [float(x) for x in raw_levels]
-    except ValueError as exc:
-        raise ValueError("Dose levels must be numbers you supply. Fields start empty on purpose.") from exc
+    levels: list[float] = []
+    for raw in raw_levels:
+        parsed = parse_numeric_field(raw)
+        if parsed.blank or parsed.invalid or parsed.value is None:
+            raise ValueError("Dose levels must be numbers you supply. Fields start empty on purpose.")
+        levels.append(parsed.value)
     ec50 = None
-    if ec50_text.strip():
-        ec50 = float(ec50_text)
-        if ec50 <= 0:
+    ec50_parsed = parse_numeric_field(ec50_text)
+    if not ec50_parsed.blank:
+        if ec50_parsed.invalid or ec50_parsed.value is None or ec50_parsed.value <= 0:
             raise ValueError("EC50 must be positive if you supply one.")
-    if not reference_text.strip():
-        raise ValueError("Enter the reference dose (the level that maps to max_effect, or the reference Cmax).")
-    reference = float(reference_text)
+        ec50 = ec50_parsed.value
+    ref_parsed = parse_numeric_field(reference_text)
+    if ref_parsed.blank or ref_parsed.invalid or ref_parsed.value is None:
+        raise ValueError(
+            "Enter the reference dose (the level that maps to max_effect, or the reference Cmax)."
+        )
+    reference = ref_parsed.value
     use_hill = ec50 is not None
     return use_hill, reference, levels, ec50
 
