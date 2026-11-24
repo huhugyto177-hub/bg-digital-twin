@@ -31,11 +31,14 @@ def test_evidence_registry_has_multiple_broad_citations():
     rows = evidence_table_rows(reg)
     assert len(rows) >= 10, "Expected a broad multi-citation literature set"
     ids = {r["id"] for r in rows}
-    # Classical CBGT / PD + beta + Triple-Control among many
-    assert "albin_young_penney_1989" in ids or "delong_1990" in ids
-    assert "brown_2003_beta" in ids or "hammond_2007_beta_osc" in ids
-    assert "li_jin_2023" in ids
+    assert "albin_1989" in ids or "delong_1990" in ids
+    assert "brown_2003" in ids or "hammond_2007" in ids
+    assert "elife_action_selection_2023" in ids
     assert "gerfen_surmeier_2011" in ids
+    blob = " ".join(r["citation"] for r in rows)
+    assert "Hao Li" not in blob
+    assert "Li H" not in blob
+    assert "Li & Jin" not in blob
     assert reg.get("calibration_note")
     assert any("affinity" in nc.lower() or "SMILES" in nc for nc in reg.get("non_claims", []))
 
@@ -44,7 +47,9 @@ def test_references_and_cou_markdown_include_literature():
     md = references_markdown()
     assert "## References / Literature Basis" in md
     assert "Citation" in md
-    assert "li_jin_2023" in md
+    assert "elife_action_selection_2023" in md
+    assert "Hao Li" not in md
+    assert "Li & Jin" not in md
     cou = cou_and_limitations_markdown()
     assert "Context of Use" in cou
     assert "Calibration" in cou or "directional" in cou.lower()
@@ -138,6 +143,8 @@ def test_decision_brief_includes_references_section(tmp_path):
     )
     text = md_path.read_text(encoding="utf-8")
     assert "## References / Literature Basis" in text
-    assert "li_jin_2023" in text
+    assert "elife_action_selection_2023" in text
+    assert "Hao Li" not in text
+    assert "Li H" not in text
     assert "Context of Use" in text
     assert "user-supplied or unknown" in text.lower() or "Custom/novel" in text
