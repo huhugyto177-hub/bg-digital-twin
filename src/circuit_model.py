@@ -62,7 +62,9 @@ def circuit_rhs(
     da = _clip(params.dopamine_tone + g_da, 0.0, 2.0)
     # Direct pathway facilitated by DA / D1 agonists
     d1_gain = 0.4 + 0.6 * da + g_d1
-    # Indirect: D2 agonists increase D2-MSN drive; antagonists reduce
+    # g_d2 adds to D2-MSN drive (agonist > 0, antagonist < 0). Dopamine tone
+    # itself still lowers this gain. GPe inhibition uses d2 * inverted-U
+    # surround, so the circuit effect of a D2-node gain is not monotone.
     d2_gain = 0.7 + 0.3 * (1.0 - 0.5 * da) + g_d2
     surround = d2_inverted_u(d2, params.d2_inverted_u_center, params.d2_inverted_u_width)
 
@@ -144,8 +146,70 @@ def _make_gain_interpolators(
     return fns
 
 
+def _zero_gain_fns() -> dict[str, callable]:
+    keys = (
+        "dopamine_tone",
+        "d1_direct",
+        "d2_indirect",
+        "stn_hyperdirect",
+        "gpe",
+        "gpi_snr",
+    )
+    return {k: (lambda _t: 0.0) for k in keys}
+
+
+_SS_CACHE: dict[tuple, np.ndarray] = {}
+
+
+def _params_cache_key(params: CircuitParams) -> tuple:
+    return tuple(sorted((k, float(v)) for k, v in params.model_dump().items()))
+
+
+def untreated_steady_state(params: CircuitParams, warmup_h: float = 25.0) -> np.ndarray:
+    """Drug-free fixed point of the chosen baseline.
+
+    A short drug-free integration supplies the guess; a root polish keeps
+    t = 0 on the untreated equilibrium so the opening transient is not an
+    artifact of the heuristic initial guess.
+    """
+    key = _params_cache_key(params)
+    cached = _SS_CACHE.get(key)
+    if cached is not None:
+        return cached.copy()
+
+    zero = _zero_gain_fns()
+
+    def rhs(_t: float, y: np.ndarray) -> list[float]:
+        return circuit_rhs(_t, y, params, zero)
+
+    guess = initial_state(params)
+    sol = solve_ivp(
+        rhs,
+        (0.0, float(warmup_h)),
+        guess,
+        method="RK45",
+        rtol=1e-7,
+        atol=1e-9,
+    )
+    if not sol.success:
+        raise RuntimeError(f"Drug-free warm-up failed: {sol.message}")
+    y = np.clip(sol.y[:, -1], params.state_floor, params.state_ceil)
+
+    from scipy.optimize import root
+
+    polished = root(lambda yy: np.asarray(rhs(0.0, yy), dtype=float), y, tol=1e-11)
+    if polished.success and np.all(np.isfinite(polished.x)):
+        y2 = np.clip(np.asarray(polished.x, dtype=float), params.state_floor, params.state_ceil)
+        r1 = float(np.linalg.norm(rhs(0.0, y)))
+        r2 = float(np.linalg.norm(rhs(0.0, y2)))
+        if r2 <= r1:
+            y = y2
+    _SS_CACHE[key] = np.asarray(y, dtype=float)
+    return _SS_CACHE[key].copy()
+
+
 def initial_state(params: CircuitParams) -> np.ndarray:
-    """Physiological resting guess."""
+    """Heuristic resting guess used only to start the drug-free fixed-point solve."""
     da = params.dopamine_tone
     return np.array(
         [
@@ -171,10 +235,12 @@ def simulate(
     rng = np.random.default_rng(config.seed)
     params = params or default_params_for_preset(config.baseline_preset)
     t = time_vector(config.duration_h, config.dt_h)
-    gains = compute_perturbation_gains(t, perturbation)
+    gains = compute_perturbation_gains(
+        t, perturbation, endogenous_tone=float(params.dopamine_tone)
+    )
     gain_fns = _make_gain_interpolators(t, gains)
 
-    y0 = initial_state(params)
+    y0 = untreated_steady_state(params)
     # Small deterministic jitter from seed (reproducible)
     if config.noise_std > 0:
         y0 = y0 + rng.normal(0.0, config.noise_std, size=y0.shape)
@@ -218,16 +284,21 @@ def run_simulation(
     params: Optional[CircuitParams] = None,
 ) -> SimResult:
     """High-level runner returning a SimResult (readouts filled by caller or here)."""
-    from .readouts import compute_readouts, summarize_kpis
+    from .readouts import analysis_window_for, compute_readouts, summarize_kpis
 
     t, states, gains = simulate(config, perturbation, params)
     readouts = compute_readouts(t, states, params or default_params_for_preset(config.baseline_preset))
-    kpis = summarize_kpis(t, readouts)
+    kpis = summarize_kpis(
+        t,
+        readouts,
+        therapeutic_window=analysis_window_for(config),
+        pk=perturbation.pk if perturbation is not None else None,
+    )
     assumptions = [
         "Context of Use: mechanistic circuit-level translation only.",
         "Does NOT predict de novo binding affinity, BBB permeability, peripheral ADMET, or clinical efficacy.",
         "PK curves are user-specified empirical envelopes, not predicted from chemistry.",
-        "Triple-Control–inspired mean-field abstraction; not a full spiking network.",
+        "Mean-field circuit abstraction; not a full spiking network.",
         f"Deterministic given seed={config.seed}.",
     ]
     return SimResult(
