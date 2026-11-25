@@ -918,3 +918,209 @@ citations:
     rating scale, and the suggestion is not a protocol.
   doi: 10.1002/0471142301.ns0925s41
   pmid: '18428668'
+- id: bernheimer_1973
+  authors: Bernheimer H, Birkmayer W, Hornykiewicz O, Jellinger K, Seitelberger F
+  year: 1973
+  journal: J Neurol Sci
+  title: Brain dopamine and the syndromes of Parkinson and Huntington. Clinical,
+    morphological and neurochemical correlations.
+  parameter_keys:
+  - dopamine_tone
+  - pd_mild
+  - pd_advanced
+  citation: Bernheimer H, Birkmayer W, Hornykiewicz O, Jellinger K, Seitelberger F.
+    Brain dopamine and the syndromes of Parkinson and Huntington. Clinical, morphological
+    and neurochemical correlations. J Neurol Sci. 1973. doi:10.1016/0022-510X(73)90175-5
+    PMID:4272516
+  assumption: Striatal dopamine loss is graded and tracks the severity of the akinetic
+    syndrome. Mild and advanced baselines are ordered by that prior. Percents from
+    the paper are not copied in as tone values.
+  doi: 10.1016/0022-510X(73)90175-5
+  pmid: '4272516'
+- id: kish_1988
+  authors: Kish SJ, Shannak K, Hornykiewicz O
+  year: 1988
+  journal: N Engl J Med
+  title: Uneven pattern of dopamine loss in the striatum of patients with idiopathic
+    Parkinson's disease.
+  parameter_keys:
+  - dopamine_tone
+  - pd_mild
+  - pd_advanced
+  citation: Kish SJ, Shannak K, Hornykiewicz O. Uneven pattern of dopamine loss in
+    the striatum of patients with idiopathic Parkinson's disease. N Engl J Med. 1988.
+    doi:10.1056/NEJM198804073181402 PMID:3352672
+  assumption: Putaminal dopamine loss in idiopathic Parkinson's disease is severe,
+    and the pattern is uneven. The mild versus advanced tones are a directional
+    ordering, not those autopsy percentages.
+  doi: 10.1056/NEJM198804073181402
+  pmid: '3352672'
+- id: fearnley_1991
+  authors: Fearnley JM, Lees AJ
+  year: 1991
+  journal: Brain
+  title: 'Ageing and Parkinson''s disease: substantia nigra regional selectivity.'
+  parameter_keys:
+  - dopamine_tone
+  - pd_mild
+  - pd_advanced
+  citation: 'Fearnley JM, Lees AJ. Ageing and Parkinson''s disease: substantia nigra
+    regional selectivity. Brain. 1991. doi:10.1093/brain/114.5.2283 PMID:1933245'
+  assumption: Nigral cell loss is greater with longer disease than at symptom onset.
+    Advanced PD uses a lower dopamine tone than the mild state. Cell-loss percentages
+    are not entered as parameters.
+  doi: 10.1093/brain/114.5.2283
+  pmid: '1933245'
+- id: reiner_1988
+  authors: Reiner A, Albin RL, Anderson KD, D'Amato CJ, Penney JB, Young AB
+  year: 1988
+  journal: Proc Natl Acad Sci U S A
+  title: Differential loss of striatal projection neurons in Huntington disease.
+  parameter_keys:
+  - d2_indirect
+  - hd_indirect_loss
+  - pathway_balance
+  citation: Reiner A, Albin RL, Anderson KD, D'Amato CJ, Penney JB, Young AB. Differential
+    loss of striatal projection neurons in Huntington disease. Proc Natl Acad Sci
+    U S A. 1988. doi:10.1073/pnas.85.15.5733 PMID:2456581
+  assumption: Early and middle Huntington disease affects enkephalinergic (indirect-pathway)
+    projections to GPe more than substance-P projections to GPi. The HD baseline
+    lowers indirect-pathway drive and does not copy cell counts.
+  doi: 10.1073/pnas.85.15.5733
+  pmid: '2456581'
+- id: albin_1990_hd
+  authors: Albin RL, Reiner A, Anderson KD, Penney JB, Young AB
+  year: 1990
+  journal: Ann Neurol
+  title: 'Striatal and nigral neuron subpopulations in rigid Huntington''s disease:
+    implications for the functional anatomy of chorea and rigidity-akinesia.'
+  parameter_keys:
+  - d2_indirect
+  - hd_indirect_loss
+  - pathway_balance
+  citation: 'Albin RL, Reiner A, Anderson KD, Penney JB, Young AB. Striatal and nigral
+    neuron subpopulations in rigid Huntington''s disease: implications for the functional
+    anatomy of chorea and rigidity-akinesia. Ann Neurol. 1990. doi:10.1002/ana.410270403'
+  assumption: Chorea is consistent with preferential loss of striatal neurons projecting
+    to the lateral pallidum. The baseline is that chorea-stage sketch, not rigid-akinetic
+    late disease and not a clinical rating.
+  doi: 10.1002/ana.410270403
+- id: cenci_2007_lid
+  authors: Cenci MA
+  year: 2007
+  journal: Trends Neurosci
+  title: Dopamine dysregulation of movement control in L-DOPA-induced dyskinesia.
+  parameter_keys:
+  - overdrive_index
+  - d1_direct
+  - lid_prone
+  - dyskinesia_risk_proxy
+  citation: Cenci MA. Dopamine dysregulation of movement control in L-DOPA-induced
+    dyskinesia. Trends Neurosci. 2007. doi:10.1016/j.tins.2007.03.005 PMID:17400300
+  assumption: LID is primed by large swings in dopamine and by postsynaptic changes
+    on striatal projection neurons. The LID-prone state keeps dopamine depleted and
+    sensitizes direct-pathway gain. It is not a dyskinesia score.
+  doi: 10.1016/j.tins.2007.03.005
+  pmid: '17400300'
+- id: conn_2005_mglu
+  authors: Conn PJ, Battaglia G, Marino MJ, Nicoletti F
+  year: 2005
+  journal: Nat Rev Neurosci
+  title: Metabotropic glutamate receptors in the basal ganglia motor circuit.
+  parameter_keys:
+  - stn_hyperdirect
+  - mglur5
+  citation: Conn PJ, Battaglia G, Marino MJ, Nicoletti F. Metabotropic glutamate receptors
+    in the basal ganglia motor circuit. Nat Rev Neurosci. 2005. doi:10.1038/nrn1763
+    PMID:16276355
+  assumption: Group I mGluRs, including mGluR5, are placed where they can add to
+    overactive basal ganglia synapses, and mGluR5 antagonists have been reported to
+    reduce parkinsonian motor signs in animals. The catalog maps an mGluR5 NAM onto
+    a negative STN/hyperdirect gain. No affinity is predicted.
+  doi: 10.1038/nrn1763
+  pmid: '16276355'
+- id: carta_2007_5ht
+  authors: Carta M, Carlsson T, Kirik D, Björklund A
+  year: 2007
+  journal: Brain
+  title: Dopamine released from 5-HT terminals is the cause of L-DOPA-induced dyskinesia
+    in parkinsonian rats.
+  parameter_keys:
+  - dopamine_tone
+  - htr1a
+  - overdrive_index
+  citation: Carta M, Carlsson T, Kirik D, Björklund A. Dopamine released from 5-HT
+    terminals is the cause of L-DOPA-induced dyskinesia in parkinsonian rats. Brain.
+    2007. doi:10.1093/brain/awm082 PMID:17452372
+  assumption: 5-HT1A agonism can dampen dopamine release from serotonin terminals
+    and reduce L-DOPA-induced dyskinesia in that rat model. The catalog uses a negative
+    dopamine-tone gain for that circuit effect. It does not claim an antiparkinsonian
+    effect and does not copy doses from the paper.
+  doi: 10.1093/brain/awm082
+  pmid: '17452372'
+- id: shen_2015_m4
+  authors: Shen W, Plotkin JL, Francardo V, et al.
+  year: 2015
+  journal: Neuron
+  title: M4 muscarinic receptor signaling ameliorates striatal plasticity deficits
+    in models of L-DOPA-induced dyskinesia.
+  parameter_keys:
+  - d1_direct
+  - m4
+  - overdrive_index
+  citation: Shen W, Plotkin JL, Francardo V, et al. M4 muscarinic receptor signaling
+    ameliorates striatal plasticity deficits in models of L-DOPA-induced dyskinesia.
+    Neuron. 2015. doi:10.1016/j.neuron.2015.10.039 PMID:26590347
+  assumption: An M4 PAM can block aberrant direct-pathway potentiation in LID models.
+    The catalog maps that class to a negative gain on the D1 node. No potency is entered.
+  doi: 10.1016/j.neuron.2015.10.039
+  pmid: '26590347'
+- id: baron_2002_gaba_gpi
+  authors: Baron MS, Wichmann T, Ma D, DeLong MR
+  year: 2002
+  journal: J Neurosci
+  title: Effects of transient focal inactivation of the basal ganglia in parkinsonian
+    primates.
+  parameter_keys:
+  - gpi_snr
+  - gpi_output
+  - gaba_a
+  citation: Baron MS, Wichmann T, Ma D, DeLong MR. Effects of transient focal inactivation
+    of the basal ganglia in parkinsonian primates. J Neurosci. 2002. doi:10.1523/JNEUROSCI.22-02-00592.2002
+    PMID:11784807
+  assumption: Focal GABA-A agonism (muscimol) in sensorimotor GPi lowered parkinsonian
+    akinesia in that primate study. The catalog uses a negative GPi/SNr gain for the
+    same direction. It is not a surgical plan and not a concentration.
+  doi: 10.1523/JNEUROSCI.22-02-00592.2002
+  pmid: '11784807'
+- id: vitek_2002_dystonia
+  authors: Vitek JL
+  year: 2002
+  journal: Mov Disord
+  title: 'Pathophysiology of dystonia: a neuronal model.'
+  parameter_keys:
+  - dystonia_surround
+  - gpi_output
+  - pathway_balance
+  citation: 'Vitek JL. Pathophysiology of dystonia: a neuronal model. Mov Disord. 2002.
+    doi:10.1002/mds.10142'
+  assumption: Dystonia has been discussed with altered GPi rate and thalamic drive,
+    and the same paper argues that a rate-only account is incomplete. The dystonia-like
+    baseline only weakens surround and does not claim to be dystonia.
+  doi: 10.1002/mds.10142
+- id: mink_2003_surround
+  authors: Mink JW
+  year: 2003
+  journal: Arch Neurol
+  title: 'The basal ganglia and involuntary movements: impaired inhibition of competing
+    motor patterns.'
+  parameter_keys:
+  - dystonia_surround
+  - d2_indirect
+  - pathway_balance
+  citation: 'Mink JW. The basal ganglia and involuntary movements: impaired inhibition
+    of competing motor patterns. Arch Neurol. 2003. doi:10.1001/archneur.60.10.1365'
+  assumption: Dystonia can be framed as impaired surround inhibition of competing
+    motor patterns. The baseline widens and weakens that surround. It does not separate
+    chorea, dystonia, and tics the way a full pattern model would.
+  doi: 10.1001/archneur.60.10.1365

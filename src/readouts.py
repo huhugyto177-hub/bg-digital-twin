@@ -53,10 +53,24 @@ Pathway balance
 
 GPi output (``gpi_output``)
     The GPi/SNr state itself (dimensionless proxy of inhibitory output).
+    ``gpi_snr_output_rate`` is the mean of that state inside the analysis window.
 
 STN–GPe coupling (``stn_gpe_coupling``)
     ``stn * (1 + 0.5 * max(0.4 - gpe, 0))``. The same term that enters the
     beta proxy. Not a measured coherence.
+
+STN burstiness proxy (``stn_burstiness_proxy``)
+    ``stn * max(0.4 - gpe, 0)``. The GPe-disinhibition piece of the coupling
+    term. The model has no spikes, so this is not an interspike-interval burst index.
+
+Dyskinesia-risk proxy (``dyskinesia_risk_proxy``)
+    Fraction of analysis-window samples with ``overdrive_index`` at or above
+    ``OVERDRIVE_THRESHOLD``. Not a clinical dyskinesia rating.
+
+Direct/indirect balance index (``direct_indirect_balance_index``)
+    ``(direct - indirect) / (|direct| + |indirect|)``, then averaged in the
+    window. Near +1 is direct-pathway dominance; near -1 is indirect/hyperdirect
+    dominance.
 
 Therapeutic-window score
     Window mean of ``max(motor - motor[0], 0) * (overdrive < threshold)``.
@@ -100,6 +114,25 @@ READOUT_DOCS: dict[str, str] = {
         "w_stn_gpi * STN − w_gpe_gpi * GPe (dimensionless proxy)."
     ),
     "gpi_output": "GPi/SNr state (dimensionless proxy of inhibitory output).",
+    "gpi_snr_output_rate": (
+        "Mean GPi/SNr state inside the analysis window (dimensionless rate proxy). "
+        "Same signal as gpi_mean_window, named as an output rate."
+    ),
+    "stn_burstiness_proxy": (
+        "Mean of STN × max(0.4 − GPe, 0) inside the analysis window "
+        "(dimensionless proxy). This is the GPe-disinhibition term inside the "
+        "STN–GPe coupling used by the beta proxy. Not a spike-burst index."
+    ),
+    "dyskinesia_risk_proxy": (
+        "Fraction of analysis-window samples with overdrive_index ≥ 1.15 "
+        "(dimensionless, 0 to 1). Derived from the overdrive index. "
+        "Not a clinical dyskinesia rating, and not specific to one disease label."
+    ),
+    "direct_indirect_balance_index": (
+        "Window mean of (direct − indirect) / (|direct| + |indirect|) "
+        "(dimensionless index). Near +1 means direct-pathway dominance; "
+        "near −1 means indirect/hyperdirect dominance."
+    ),
     "stn_gpe_coupling": (
         "stn * (1 + 0.5 * max(0.4 − gpe, 0)) (dimensionless proxy). "
         "Same coupling term used inside the beta proxy."
@@ -199,6 +232,8 @@ def compute_readouts(
     )
     benefit = np.maximum(motor_readiness - float(motor_readiness[0]), 0.0)
     therapeutic_window_trace = benefit * (overdrive_index < OVERDRIVE_THRESHOLD)
+    burstiness = stn * np.maximum(0.4 - gpe, 0.0)
+    balance_index = pathway_balance / (np.abs(direct) + np.abs(indirect) + 1e-9)
 
     return {
         "pathway_balance": pathway_balance,
@@ -209,6 +244,8 @@ def compute_readouts(
         "indirect_hyperdirect": indirect,
         "gpi_output": np.asarray(gpi, dtype=float),
         "stn_gpe_coupling": np.asarray(stn_gpe_coupling, dtype=float),
+        "stn_burstiness_proxy": np.asarray(burstiness, dtype=float),
+        "direct_indirect_balance_index": np.asarray(balance_index, dtype=float),
         "therapeutic_window_trace": np.asarray(therapeutic_window_trace, dtype=float),
     }
 
@@ -271,6 +308,11 @@ def summarize_kpis(
 
     time_overdrive = float(np.sum(od[mask] > overdrive_threshold) * dt)
     overdrive_flag = 1.0 if float(np.max(od[mask])) >= overdrive_threshold else 0.0
+    n_mask = int(np.sum(mask))
+    if n_mask == 0:
+        dyskinesia_risk = float("nan")
+    else:
+        dyskinesia_risk = float(np.sum(od[mask] >= overdrive_threshold) / n_mask)
 
     motor_threshold = float(motor[0]) + float(motor_on_delta)
     above = motor >= motor_threshold
@@ -346,6 +388,20 @@ def summarize_kpis(
         "direct_mean_window": mean_window(readouts["direct_pathway"]),
         "indirect_mean_window": mean_window(readouts["indirect_hyperdirect"]),
         "gpi_mean_window": mean_window(readouts["gpi_output"]) if "gpi_output" in readouts else mean_window(np.zeros_like(motor)),
+        "gpi_snr_output_rate": (
+            mean_window(readouts["gpi_output"]) if "gpi_output" in readouts else mean_window(np.zeros_like(motor))
+        ),
+        "stn_burstiness_proxy": (
+            mean_window(readouts["stn_burstiness_proxy"])
+            if "stn_burstiness_proxy" in readouts
+            else float("nan")
+        ),
+        "dyskinesia_risk_proxy": float(dyskinesia_risk),
+        "direct_indirect_balance_index": (
+            mean_window(readouts["direct_indirect_balance_index"])
+            if "direct_indirect_balance_index" in readouts
+            else float("nan")
+        ),
         "stn_gpe_mean_window": (
             mean_window(readouts["stn_gpe_coupling"])
             if "stn_gpe_coupling" in readouts

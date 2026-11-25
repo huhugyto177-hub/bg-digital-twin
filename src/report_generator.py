@@ -244,6 +244,23 @@ def preclinical_brief_markdown(study, registry: Optional[dict] = None) -> str:
             )
         )
     lines.append("")
+    ref_dose = next((row for row in study.doses if abs(row.level - 1.0) < 1e-9), None)
+    if ref_dose is None and study.doses:
+        ref_dose = study.doses[len(study.doses) // 2]
+    if ref_dose is not None:
+        from .readouts import READOUT_DOCS
+
+        lines.extend(["## Derived readouts at the reference dose", ""])
+        for key in (
+            "dyskinesia_risk_proxy",
+            "gpi_snr_output_rate",
+            "stn_burstiness_proxy",
+            "direct_indirect_balance_index",
+        ):
+            lines.append(
+                f"- {key}: {fmt_sig(ref_dose.kpis.get(key))}. {READOUT_DOCS.get(key, '')}"
+            )
+        lines.append("")
     if study.inverted_u:
         lines.append(
             "Inverted-U: a higher exposure has a lower therapeutic-index margin than an interior dose."

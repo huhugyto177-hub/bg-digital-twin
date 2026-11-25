@@ -102,6 +102,8 @@ def run_uncertainty(
         "pathway_balance",
         "gpi_output",
         "stn_gpe_coupling",
+        "stn_burstiness_proxy",
+        "direct_indirect_balance_index",
         "therapeutic_window_trace",
     )
     kpi_rows: list[dict[str, float]] = []

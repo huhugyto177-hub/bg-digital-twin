@@ -1,0 +1,35 @@
+# Advanced parkinsonian circuit state.
+# Directional prior: nigral loss and putaminal dopamine depletion are more
+# severe later in the disease than at onset (Fearnley & Lees 1991; Kish 1988;
+# Bernheimer 1973; DeLong 1990). Scenario levels, not measured concentrations.
+# The existing pd_depleted file stays the moderate reference used by benchmarks 01-17.
+dopamine_tone: 0.08
+w_ctx_d1: 0.95
+w_ctx_d2: 1.08
+w_ctx_stn: 1.2
+w_d1_gpi: 0.95
+w_d2_gpe: 1.1
+w_gpe_stn: 0.85
+w_gpe_gpi: 0.45
+w_stn_gpe: 1.25
+w_stn_gpi: 1.65
+w_gpi_thal: 1.6
+w_thal_ctx: 0.4
+tau_ctx: 0.15
+tau_d1: 0.2
+tau_d2: 0.2
+tau_gpe: 0.18
+tau_stn: 0.12
+tau_gpi: 0.15
+tau_thal: 0.2
+drive_ctx: 0.5
+drive_d1: 0.06
+drive_d2: 0.4
+drive_gpe: 0.22
+drive_stn: 0.55
+drive_gpi: 0.72
+drive_thal: 0.16
+d2_inverted_u_center: 0.55
+d2_inverted_u_width: 0.35
+state_floor: 0.0
+state_ceil: 2.5

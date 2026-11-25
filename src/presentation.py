@@ -16,8 +16,8 @@ from cycler import cycler
 
 from .readouts import DEFAULT_ANALYSIS_WINDOW, READOUT_DOCS, analysis_window_for
 
-# Restrained scientific palette. Shared by the app and the decision-brief figures.
-_COLORS = ["#1B4F72", "#B85C38", "#1F7A6B", "#5C4A72", "#8A6A3B", "#3D5A80"]
+# Navy / teal scientific palette. Shared by the app and the decision-brief figures.
+_COLORS = ["#0F6E6B", "#1B3A4B", "#C47B4A", "#3D6B8C", "#6B5B7A", "#8C6A4A"]
 
 PRIMARY_KPIS: list[tuple[str, str]] = [
     ("motor_mean_window", "dimensionless proxy"),
@@ -38,6 +38,10 @@ PRIMARY_KPIS: list[tuple[str, str]] = [
     ("beta_at_trough", "dimensionless proxy at trough"),
     ("pathway_balance_mean_window", "dimensionless proxy"),
     ("gpi_mean_window", "dimensionless proxy"),
+    ("gpi_snr_output_rate", "dimensionless rate proxy"),
+    ("dyskinesia_risk_proxy", "fraction of analysis-window samples"),
+    ("stn_burstiness_proxy", "dimensionless proxy"),
+    ("direct_indirect_balance_index", "dimensionless index from -1 to 1"),
     ("stn_gpe_mean_window", "dimensionless proxy"),
 ]
 
@@ -48,17 +52,19 @@ def apply_mpl_style() -> None:
             "axes.spines.top": False,
             "axes.spines.right": False,
             "axes.grid": True,
-            "grid.alpha": 0.28,
+            "axes.axisbelow": True,
+            "grid.alpha": 0.85,
             "grid.linewidth": 0.6,
+            "grid.color": "#D5E0E4",
             "font.size": 10,
             "axes.titlesize": 12,
             "axes.labelsize": 10,
             "figure.facecolor": "white",
-            "axes.facecolor": "white",
-            "axes.edgecolor": "#2C3E50",
-            "axes.labelcolor": "#1C2833",
-            "xtick.color": "#1C2833",
-            "ytick.color": "#1C2833",
+            "axes.facecolor": "#FBFCFC",
+            "axes.edgecolor": "#1B3A4B",
+            "axes.labelcolor": "#14233A",
+            "xtick.color": "#14233A",
+            "ytick.color": "#14233A",
             "axes.prop_cycle": cycler(color=_COLORS),
             "lines.linewidth": 1.8,
         }
@@ -66,7 +72,12 @@ def apply_mpl_style() -> None:
 
 
 def fmt_sig(value: float | None, sig: int = 3) -> str:
-    """Format a number to ``sig`` significant figures. Non-finite values are n/a."""
+    """Format a number to ``sig`` significant figures. Non-finite values are n/a.
+
+    Magnitudes below 1e-4 are shown as 0. On these dimensionless proxies that
+    is numerical dust (a state on the rate floor, a percent change of 1e-6),
+    and printing it as 1e-66 is not a readout.
+    """
     if value is None:
         return "n/a"
     try:
@@ -75,6 +86,8 @@ def fmt_sig(value: float | None, sig: int = 3) -> str:
         return "n/a"
     if math.isnan(x) or math.isinf(x):
         return "n/a"
+    if abs(x) < 1e-4:
+        return "0"
     return f"{x:.{sig}g}"
 
 
@@ -147,7 +160,7 @@ def sensitivity_figure(ranking: list[tuple[str, float]], title: str):
     labels = [name.replace("_", " ") for name, _ in ranking][::-1]
     scores = [score for _, score in ranking][::-1]
     fig, ax = plt.subplots(figsize=(7.2, 3.2))
-    ax.barh(labels, scores, color="#1B4F72")
+    ax.barh(labels, scores, color="#0F6E6B")
     ax.set_xlabel("Share of |Δ motor window| (dimensionless proxy)")
     ax.set_title(title)
     fig.tight_layout()
