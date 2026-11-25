@@ -88,7 +88,12 @@ class MoleculePerturbation(BaseModel):
 
 class BaselinePreset(str, Enum):
     HEALTHY = "healthy"
+    PD_MILD = "pd_mild"
     PD_DEPLETED = "pd_depleted"
+    PD_ADVANCED = "pd_advanced"
+    LID_PRONE = "lid_prone"
+    HD_INDIRECT_LOSS = "hd_indirect_loss"
+    DYSTONIA_SURROUND = "dystonia_surround"
 
 
 class SimulationConfig(BaseModel):

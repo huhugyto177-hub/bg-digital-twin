@@ -22,12 +22,20 @@ def load_yaml(path: Path | str) -> dict[str, Any]:
     return yaml.safe_load(Path(path).read_text(encoding="utf-8")) or {}
 
 
+_BASELINE_FILES = {
+    BaselinePreset.HEALTHY: "baseline_healthy.yaml",
+    BaselinePreset.PD_MILD: "baseline_pd_mild.yaml",
+    BaselinePreset.PD_DEPLETED: "disease_pd_depleted.yaml",
+    BaselinePreset.PD_ADVANCED: "baseline_pd_advanced.yaml",
+    BaselinePreset.LID_PRONE: "baseline_lid_prone.yaml",
+    BaselinePreset.HD_INDIRECT_LOSS: "baseline_hd_indirect_loss.yaml",
+    BaselinePreset.DYSTONIA_SURROUND: "baseline_dystonia_surround.yaml",
+}
+
+
 def load_baseline_params(preset: BaselinePreset | str) -> CircuitParams:
     preset = BaselinePreset(preset) if isinstance(preset, str) else preset
-    if preset == BaselinePreset.PD_DEPLETED:
-        path = CONFIGS / "disease_pd_depleted.yaml"
-    else:
-        path = CONFIGS / "baseline_healthy.yaml"
+    path = CONFIGS / _BASELINE_FILES[preset]
     data = load_yaml(path)
     return CircuitParams(**{k: v for k, v in data.items() if k in CircuitParams.model_fields})
 

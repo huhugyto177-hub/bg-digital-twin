@@ -109,6 +109,7 @@ def circuit_rhs(
 
 
 def default_params_for_preset(preset: BaselinePreset) -> CircuitParams:
+    preset = BaselinePreset(preset)
     if preset == BaselinePreset.PD_DEPLETED:
         return CircuitParams(
             dopamine_tone=0.22,
@@ -119,7 +120,11 @@ def default_params_for_preset(preset: BaselinePreset) -> CircuitParams:
             w_ctx_stn=1.05,
             w_stn_gpi=1.45,
         )
-    return CircuitParams()
+    if preset == BaselinePreset.HEALTHY:
+        return CircuitParams()
+    from .config_loader import load_baseline_params
+
+    return load_baseline_params(preset)
 
 
 def load_circuit_params(path: Path | str) -> CircuitParams:

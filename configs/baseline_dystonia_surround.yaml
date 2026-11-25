@@ -1,0 +1,36 @@
+# Dystonia-like loss of surround inhibition.
+# Mink 2003: competing motor patterns are poorly suppressed. Vitek 2002: a
+# rate-only account of dystonia is incomplete, so this file only weakens
+# indirect-pathway surround and modestly lowers GPi drive. It does not claim
+# to be dystonia. Essential tremor is not represented; that literature is not
+# a cortico-basal rate imbalance.
+dopamine_tone: 0.85
+w_ctx_d1: 1.0
+w_ctx_d2: 0.72
+w_ctx_stn: 0.78
+w_d1_gpi: 1.05
+w_d2_gpe: 0.45
+w_gpe_stn: 1.05
+w_gpe_gpi: 0.55
+w_stn_gpe: 0.95
+w_stn_gpi: 0.95
+w_gpi_thal: 1.05
+w_thal_ctx: 0.65
+tau_ctx: 0.15
+tau_d1: 0.2
+tau_d2: 0.2
+tau_gpe: 0.18
+tau_stn: 0.12
+tau_gpi: 0.15
+tau_thal: 0.2
+drive_ctx: 0.6
+drive_d1: 0.18
+drive_d2: 0.14
+drive_gpe: 0.4
+drive_stn: 0.26
+drive_gpi: 0.36
+drive_thal: 0.32
+d2_inverted_u_center: 0.35
+d2_inverted_u_width: 0.85
+state_floor: 0.0
+state_ceil: 2.5

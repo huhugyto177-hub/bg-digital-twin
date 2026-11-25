@@ -6,10 +6,13 @@ enableXsrfProtection = true
 [browser]
 gatherUsageStats = false
 
+[client]
+toolbarMode = "viewer"
+
 [theme]
 base = "light"
-primaryColor = "#1B4F72"
-backgroundColor = "#F4F7F8"
-secondaryBackgroundColor = "#E4EEF2"
-textColor = "#1C2833"
+primaryColor = "#0F6E6B"
+backgroundColor = "#F6F4F0"
+secondaryBackgroundColor = "#E6EEEF"
+textColor = "#14233A"
 font = "sans serif"

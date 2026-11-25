@@ -109,12 +109,13 @@ Affinity, BBB, and toxicity remain **user inputs or unknown**.
 ### Streamlit steps
 
 1. Launch the app (`python -m streamlit run app/streamlit_app.py`).
-2. **Study design** is the first tab. PK and dose fields start empty. Placeholders are examples, not measured values.
-3. Or click a mechanistic illustration preset (L-DOPA reference, D1 PAM, D1 partial agonist, D2/D3 modulator, GPR6 inverse agonist). Each one is labeled not calibrated.
-4. **Benchmarks** runs a file under `configs/benchmarks/`. Leave “Use each benchmark’s configured duration” checked unless you mean to override it.
-5. **Custom candidate** accepts YAML or a form. Supply mechanism and PK yourself.
-6. Download trajectories CSV, the KPI table, config JSON, and a one-page decision brief (Markdown and PDF).
-7. **Context of Use & Limitations** lists the five non-claims and the evidence registry.
+2. **Getting started** is the first tab: what the tool does, a 3-step quick start, input units, how to read each readout, a worked example, and the Context of Use / non-claims.
+3. **Study design** is prefilled. Onset 0 h, Tmax 1.5 h, half-life 2 h, duration 8 h, doses 0.5 / 1 / 2, and reference dose 1 are an illustrative timebase, not measured PK. EC50, reference Cmax, and ka stay off until you enable assay PK and type values you have.
+4. Or click a mechanistic illustration preset (L-DOPA reference, D1 PAM, D1 partial agonist, D2/D3 modulator, GPR6 inverse agonist). Each one is labeled not calibrated.
+5. **Benchmarks** runs a file under `configs/benchmarks/`. Leave “Use each benchmark’s configured duration” checked unless you mean to override it. IDs 01–17 are unchanged.
+6. **Custom candidate** accepts a prefilled form or YAML on the same illustrative timebase.
+7. Download trajectories CSV, the KPI table, config JSON, and a one-page decision brief (Markdown and PDF).
+8. **Context of Use & Limitations** lists the five non-claims and the evidence registry. The same non-claims are on Getting started, and a short Context of Use line stays above the tabs.
 
 ### YAML example
 
@@ -162,6 +163,8 @@ Or CLI brief from a custom benchmark YAML under `configs/benchmarks/`.
 | `src/uncertainty.py` | LHS/MC P10–P90 + OAT sensitivity |
 | `src/dose_response.py` | Exposure sweep and inverted-U flag |
 | `src/study_design.py` | 3–5 dose preclinical sweeps and illustration presets |
+| `src/catalog.py` | Baseline and mechanism catalogs; illustrative form defaults |
+| `src/guide.py` | Getting started text, including the non-claims |
 | `src/presentation.py` | Tables, CSV, and the shared matplotlib style |
 | `src/evidence_registry.py` | Citation / assumption map + References markdown |
 | `src/report_generator.py` | Decision brief Markdown and one-page PDF |
@@ -184,6 +187,10 @@ All activity readouts are **dimensionless proxies**. Time readouts use the simul
 | `overdrive_index` | Excess-drive proxy; the flag uses a peak of 1.15 inside the window |
 | `therapeutic_index_margin` | Motor benefit above the untreated reference, reduced by overdrive past 1.15 |
 | `pathway_balance`, `gpi_output`, `stn_gpe_coupling` | Direct-versus-indirect balance, GPi rate, and the STN–GPe term |
+| `dyskinesia_risk_proxy` | Fraction of analysis-window samples with overdrive index ≥ 1.15. Not a clinical rating |
+| `gpi_snr_output_rate` | Window mean of the GPi/SNr state (dimensionless rate proxy) |
+| `stn_burstiness_proxy` | Window mean of STN × max(0.4 − GPe, 0). Not a spike-burst index |
+| `direct_indirect_balance_index` | Window mean of (direct − indirect) / (|direct| + |indirect|), from −1 to +1 |
 
 Simulations start at the drug-free steady state of the selected baseline, so t = 0 is not a startup transient.
 
@@ -207,6 +214,33 @@ Files under `configs/benchmarks/` are mechanistic illustrations. `01`–`05` kee
 | `17_gpr6_inverse_agonist` | Reduced indirect-pathway drive | Sun 2021; Barekatain 2024 |
 
 The Streamlit **Study design** tab can run L-DOPA reference, D1 PAM, D1 partial agonist, D2/D3 modulator, and GPR6 inverse-agonist presets in one click. Each preset is labeled “mechanistic illustration preset, not calibrated”.
+
+## Baselines
+
+`healthy` and `pd_depleted` are unchanged. `pd_depleted` remains the moderate reference behind benchmarks 01–17. Added circuit states are directional sketches, not fitted concentrations:
+
+| Preset | What it sketches | Registry ids |
+|--------|------------------|--------------|
+| `pd_mild` | Partial dopamine loss between healthy and the moderate reference | `bernheimer_1973`, `kish_1988`, `fearnley_1991` |
+| `pd_advanced` | More severe dopamine loss than `pd_depleted` (higher GPi output and beta) | `fearnley_1991`, `kish_1988`, `bernheimer_1973` |
+| `lid_prone` | Depleted tone with a sensitized direct pathway | `cenci_2007_lid`, `calabresi_2010`, `picconi_2003`, `jenner_2008` |
+| `hd_indirect_loss` | Early Huntington-like loss of indirect-pathway drive | `reiner_1988`, `albin_1990_hd` |
+| `dystonia_surround` | Weaker surround inhibition, not a parkinsonian beta state | `mink_2003_surround`, `vitek_2002_dystonia` |
+
+Essential tremor is not a baseline. The rate skeleton here does not represent a cerebello–thalamic oscillator, and the dystonia file does not claim that a rate change is sufficient (Vitek 2002).
+
+## Mechanism illustrations
+
+These are extra mappings onto the existing nodes. Magnitudes are illustrative. None of them asserts EC50, Cmax, or a published half-life. The shared timebase remains onset 0 h, Tmax 1.5 h, half-life 2 h.
+
+| Illustration | Node and circuit field | Why that sign | Registry id |
+|--------------|------------------------|---------------|-------------|
+| D1 direct-pathway agonist | `d1_direct` agonist | Positive direct-pathway gain | `gerfen_surmeier_2011` |
+| mGluR5 NAM | `stn_hyperdirect` NAM | Less glutamatergic drive at STN | `conn_2005_mglu` |
+| 5-HT1A agonist | `dopamine_tone` NAM | Less dopamine release from serotonin terminals. The NAM field is the circuit sign, not the receptor class | `carta_2007_5ht` |
+| Muscarinic M4 PAM | `d1_direct` NAM | M4 PAM reduces direct-pathway potentiation. The model field carries that negative gain | `shen_2015_m4` |
+| GABA-A facilitation in GPi/SNr | `gpi_snr` NAM | Focal GABA-A agonism lowers GPi output, so the node gain is negative | `baron_2002_gaba_gpi` |
+| Adenosine A2A antagonist | `d2_indirect` agonist | Same gain sign as benchmark 11 | `schwarzschild_2006` |
 
 ## Reproducibility
 
