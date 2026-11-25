@@ -1,0 +1,19 @@
+# Same illustrative defaults as the study-design form (src/catalog.py).
+# Not measured PK or potency. Add ec50_nM and cmax_nM only from an assay.
+name: Example D1 candidate
+description: User-defined mechanistic scenario. This file does not supply assay or PK measurements.
+notes: >
+  Affinity, blood-brain barrier penetration, and toxicity are user inputs or unknown.
+  potency not specified; normalized exposure shape.
+  onset 0 h, Tmax 1.5 h, and half-life 2 h are the illustrative form timebase,
+  not a published PK profile. max_effect 0.8 is the illustrative D1-agonist default.
+pk:
+  onset_h: 0.0
+  tmax_h: 1.5
+  half_life_h: 2.0
+  n_doses: 1
+modulations:
+  - target_node: d1_direct
+    mechanism: agonist
+    max_effect: 0.8
+    hill_coeff: 1.0

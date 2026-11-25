@@ -1,0 +1,64 @@
+name: Bug report
+description: A scenario, readout, or screen does something other than what the code and docs say.
+title: "[Bug]: "
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thank you for reporting this. Please do not include personal names, email addresses, phone numbers, or patient information.
+
+        Readouts are dimensionless proxies. A result that looks clinically surprising is not, by itself, a bug. A bug is a crash, a wrong unit, a number that contradicts the documented definition, or a scenario that ignores the inputs you entered.
+  - type: textarea
+    id: what-happened
+    attributes:
+      label: What happened
+      description: What did you run, and what did you get?
+      placeholder: Benchmark 06 on the depleted baseline printed a window-mean beta that does not match a second run with the same seed.
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: What did you expect?
+    validations:
+      required: true
+  - type: input
+    id: scenario
+    attributes:
+      label: Scenario or config
+      description: Benchmark filename, preset name, or the YAML you used. Paste the YAML if it is short and contains no private data.
+      placeholder: configs/benchmarks/06_ldopa_normalized_reference.yaml
+  - type: input
+    id: version
+    attributes:
+      label: Version
+      description: Output of python -c "import src; print(src.__version__)" and the commit if you have it.
+      placeholder: "1.1.0"
+    validations:
+      required: true
+  - type: dropdown
+    id: python
+    attributes:
+      label: Python version
+      options:
+        - "3.11"
+        - "3.12"
+        - Other
+    validations:
+      required: true
+  - type: textarea
+    id: reproduce
+    attributes:
+      label: Steps to reproduce
+      placeholder: |
+        1. python -m pip install -r requirements.txt
+        2. python examples/run_benchmark.py
+    validations:
+      required: true
+  - type: textarea
+    id: logs
+    attributes:
+      label: Traceback or screenshot
+      description: Paste a traceback if there is one. Crop out anything that identifies a person.
+      render: shell

@@ -1,0 +1,21 @@
+cff-version: 1.2.0
+title: Basal Ganglia Digital Twin
+message: If you use this software, please cite it using the metadata in this file.
+type: software
+authors:
+  - name: BG Digital Twin contributors
+version: 1.2.0
+date-released: 2026-11-24
+license: MIT
+repository-code: https://github.com/huhugyto177-hub/bg-digital-twin
+url: https://bg-digital-twin-landing.vercel.app
+abstract: >-
+  Preclinical mean-field simulator of a cortico-basal ganglia-thalamic
+  circuit. It maps a user-specified target, mechanism, and exposure envelope
+  to dimensionless circuit proxies. It does not predict binding, blood-brain
+  barrier penetration, ADMET, toxicity, or clinical efficacy.
+keywords:
+  - basal ganglia
+  - computational neuroscience
+  - preclinical
+  - digital twin

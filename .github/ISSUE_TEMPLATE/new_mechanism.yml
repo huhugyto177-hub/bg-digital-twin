@@ -1,0 +1,79 @@
+name: New mechanism
+description: Propose a target, mechanism, or baseline. A DOI or PMID is required.
+title: "[Mechanism]: "
+labels: ["mechanism"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        A new mechanism or baseline needs a paper a reviewer can open. The citation has to support a directional prior (for example, which pathway the perturbation engages). It does not need to, and must not be asked to, supply a potency or a PK profile that the paper does not report.
+
+        Do not include personal contact details. Literature author names belong in the citation, in the same form as `configs/evidence_registry.yaml`.
+  - type: input
+    id: name
+    attributes:
+      label: Short name
+      placeholder: GPR6 inverse agonist, indirect pathway
+    validations:
+      required: true
+  - type: dropdown
+    id: target
+    attributes:
+      label: Target node
+      description: The circuit node the gain would act on. Add a note in the proposal if none of these fit.
+      options:
+        - dopamine_tone
+        - d1_direct
+        - d2_indirect
+        - stn_hyperdirect
+        - gpe
+        - gpi_snr
+        - Other or more than one
+    validations:
+      required: true
+  - type: dropdown
+    id: mechanism
+    attributes:
+      label: Mechanism
+      options:
+        - agonist
+        - antagonist
+        - partial_agonist
+        - pam
+        - nam
+        - channel_blocker
+        - Other
+    validations:
+      required: true
+  - type: input
+    id: citation
+    attributes:
+      label: Citation
+      description: DOI or PMID, plus a one-line bibliographic stub. A reviewer must be able to open it.
+      placeholder: "doi:10.7554/eLife.87644"
+    validations:
+      required: true
+  - type: textarea
+    id: prior
+    attributes:
+      label: Directional prior this paper supports
+      description: One or two sentences. What sign or pathway does the paper justify? Do not paste an EC50 or a half-life unless the paper states it and you quote the location.
+    validations:
+      required: true
+  - type: textarea
+    id: parameters
+    attributes:
+      label: Parameter keys this would speak to
+      description: Names already used in the evidence registry, such as d2_indirect or beta_proxy.
+      placeholder: d2_indirect, beta_proxy
+  - type: checkboxes
+    id: claims
+    attributes:
+      label: Claims
+      options:
+        - label: I have not invented an EC50, Cmax, half-life, Tmax, onset, or any other potency or PK number.
+          required: true
+        - label: I am not asking for SMILES-to-affinity, structure-to-activity, blood–brain barrier, ADMET, toxicity, or clinical-efficacy prediction.
+          required: true
+        - label: Any timing value I want copied from the paper will be named in the benchmark note, and everything else will stay on the shared illustration timebase.
+          required: true
