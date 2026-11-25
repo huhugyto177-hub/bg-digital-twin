@@ -1,0 +1,47 @@
+name: Feature request
+description: A change to the app, the API, or the documentation that does not add a new biological mechanism.
+title: "[Feature]: "
+labels: ["enhancement"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Use the "New mechanism" form instead if you want a new target, drug class, baseline, or circuit effect. That form requires a citation.
+
+        This simulator does not add structure-to-activity, blood–brain barrier, ADMET, toxicity, or clinical-efficacy prediction.
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem
+      description: What is hard to do with the simulator today?
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposal
+      description: What should change, and how would a reader know it worked?
+    validations:
+      required: true
+  - type: dropdown
+    id: area
+    attributes:
+      label: Area
+      options:
+        - Streamlit app
+        - Python API
+        - Readout or figure
+        - Documentation
+        - Tests or packaging
+        - Other
+    validations:
+      required: true
+  - type: checkboxes
+    id: bounds
+    attributes:
+      label: Scope check
+      options:
+        - label: This request does not ask the model to predict binding from a chemical structure, blood–brain barrier penetration, ADMET, toxicity, or clinical efficacy.
+          required: true
+        - label: This request does not ask for an invented EC50, Cmax, half-life, or other PK number.
+          required: true
